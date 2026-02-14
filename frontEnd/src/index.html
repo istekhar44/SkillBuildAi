@@ -1,0 +1,1054 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minimalist Resume Builder</title>
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- jspdf and html2canvas for PDF Generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    
+    <!-- Google Font: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* Set base font */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8f9fa; /* Soft grey background */
+        }
+        
+        /* Hide scrollbar for clean look */
+        ::-webkit-scrollbar {
+            width: 0px;
+            background: transparent;
+        }
+
+        /* Styles for the resume preview to make it look like a document */
+        #resume-preview {
+            background-color: #ffffff;
+            /* A4 aspect ratio (approx) */
+            min-height: 1000px; 
+            /* Standard US Letter width */
+            width: 100%;
+            max-width: 816px; /* 8.5in * 96px/in */
+            margin-left: auto;
+            margin-right: auto;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            padding: 72px; /* 0.75in * 96px/in */
+        }
+
+        /* Ensure preview is responsive on small screens */
+        @media (max-width: 768px) {
+            #resume-preview {
+                padding: 24px;
+                min-height: auto;
+            }
+        }
+
+        /* Custom styles for resume preview sections */
+        #resume-preview h2 {
+            font-size: 1.25rem; /* 20px */
+            font-weight: 600;
+            color: #1a56db; /* Soft blue */
+            border-bottom: 2px solid #e0e7ff; /* Lighter blue */
+            padding-bottom: 4px;
+            margin-top: 20px;
+        }
+        
+        #resume-preview h3 {
+            font-size: 1.125rem; /* 18px */
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        #resume-preview p {
+            font-size: 0.95rem; /* ~15px */
+            color: #374151;
+            line-height: 1.6;
+        }
+
+        /* Simple loading spinner */
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border-left-color: #1a56db;
+            animation: spin 1s ease infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="antialiased text-gray-800">
+
+    <!-- Navbar -->
+    <nav class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex-shrink-0 flex items-center">
+                    <span class="text-2xl font-bold text-blue-600">ResumeBuilder</span>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <!-- User info / Auth buttons -->
+                    <div id="auth-container" class="flex items-center space-x-3">
+                        <span id="user-email" class="text-sm text-gray-600 hidden"></span>
+                        <button id="login-nav-btn" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-lg text-sm font-medium">Login</button>
+                        <button id="register-nav-btn" class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 shadow-sm">Register</button>
+                        <button id="logout-btn" class="hidden bg-gray-200 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-300">Logout</button>
+                    </div>
+                    <!-- Action Buttons -->
+                    <button id="ats-check-btn" class="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-indigo-700 shadow-sm hidden">ATS Check</button>
+                    <button id="save-btn" class="bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-green-700 shadow-sm hidden">Save to Cloud</button>
+                    <button id="download-pdf-btn" class="bg-red-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-red-700 shadow-sm">Download PDF</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content: Form (Left) and Preview (Right) -->
+    <main class="max-w-full mx-auto p-4 lg:p-8 grid grid-cols-1 lg:grid-cols-2 gap-8">
+        
+        <!-- === Left Column: Resume Form === -->
+        <div class="bg-white p-6 rounded-2xl shadow-lg h-fit lg:sticky top-24">
+            <h1 class="text-2xl font-bold mb-6 text-gray-800">Edit Your Resume</h1>
+            <form id="resume-form" class="space-y-6">
+
+                <!-- Personal Info Section -->
+                <details class="group" open>
+                    <summary class="text-xl font-semibold cursor-pointer list-none flex justify-between items-center text-gray-700 group-open:text-blue-600">
+                        Personal Info
+                        <span class="text-blue-600 group-open:rotate-180 transition-transform duration-300">▼</span>
+                    </summary>
+                    <div class="mt-4 space-y-4">
+                        <input type="text" id="name" placeholder="Full Name" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" required>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <input type="email" id="email" placeholder="Email" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" required>
+                            <input type="tel" id="phone" placeholder="Phone Number" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <input type="text" id="linkedin" placeholder="LinkedIn Profile URL" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
+                            <input type="text" id="portfolio" placeholder="Portfolio/Website URL" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
+                        </div>
+                        <textarea id="summary" placeholder="Professional Summary..." class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none h-28 resize-none"></textarea>
+                    </div>
+                </details>
+                
+                <hr>
+
+                <!-- Education Section -->
+                <details class="group">
+                    <summary class="text-xl font-semibold cursor-pointer list-none flex justify-between items-center text-gray-700 group-open:text-blue-600">
+                        Education
+                        <span class="text-blue-600 group-open:rotate-180 transition-transform duration-300">▼</span>
+                    </summary>
+                    <div id="education-form-list" class="mt-4 space-y-4">
+                        <!-- Education items will be dynamically inserted here -->
+                    </div>
+                    <button type="button" id="add-education-btn" class="mt-4 text-sm font-medium text-blue-600 hover:text-blue-800">+ Add Education</button>
+                </details>
+
+                <hr>
+                
+                <!-- Experience Section -->
+                <details class="group">
+                    <summary class="text-xl font-semibold cursor-pointer list-none flex justify-between items-center text-gray-700 group-open:text-blue-600">
+                        Work Experience
+                        <span class="text-blue-600 group-open:rotate-180 transition-transform duration-300">▼</span>
+                    </summary>
+                    <div id="experience-form-list" class="mt-4 space-y-4">
+                        <!-- Experience items will be dynamically inserted here -->
+                    </div>
+                    <button type="button" id="add-experience-btn" class="mt-4 text-sm font-medium text-blue-600 hover:text-blue-800">+ Add Experience</button>
+                </details>
+                
+                <hr>
+
+                <!-- Projects Section -->
+                <details class="group">
+                    <summary class="text-xl font-semibold cursor-pointer list-none flex justify-between items-center text-gray-700 group-open:text-blue-600">
+                        Projects
+                        <span class="text-blue-600 group-open:rotate-180 transition-transform duration-300">▼</span>
+                    </summary>
+                    <div id="projects-form-list" class="mt-4 space-y-4">
+                        <!-- Project items will be dynamically inserted here -->
+                    </div>
+                    <button type="button" id="add-project-btn" class="mt-4 text-sm font-medium text-blue-600 hover:text-blue-800">+ Add Project</button>
+                </details>
+
+                <hr>
+                
+                <!-- Skills Section -->
+                <details class="group">
+                    <summary class="text-xl font-semibold cursor-pointer list-none flex justify-between items-center text-gray-700 group-open:text-blue-600">
+                        Skills
+                        <span class="text-blue-600 group-open:rotate-180 transition-transform duration-300">▼</span>
+                    </summary>
+                    <div class="mt-4">
+                        <textarea id="skills" placeholder="List your skills, separated by commas (e.g., JavaScript, React, Node.js, Project Management)" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none h-32 resize-none"></textarea>
+                    </div>
+                </details>
+
+            </form>
+        </div>
+
+        <!-- === Right Column: Resume Preview === -->
+        <div class="bg-gray-100 p-4 lg:p-8 rounded-2xl shadow-inner">
+            <h1 class="text-2xl font-bold mb-6 text-gray-800 text-center">Live Preview</h1>
+            <!-- This is the container that will be captured for PDF -->
+            <div id="resume-preview">
+                <!-- Name and Contact -->
+                <div class="text-center">
+                    <h1 id="preview-name" class="text-4xl font-bold text-gray-900">Your Name</h1>
+                    <div id="preview-contact" class="mt-2 text-sm text-gray-600 space-x-4">
+                        <!-- Contact info will be dynamically inserted here -->
+                    </div>
+                </div>
+
+                <!-- Summary -->
+                <div id="preview-summary-container" class="mt-6 hidden">
+                    <h2>Summary</h2>
+                    <p id="preview-summary" class="mt-2 text-gray-700"></p>
+                </div>
+
+                <!-- Skills -->
+                <div id="preview-skills-container" class="mt-6 hidden">
+                    <h2>Skills</h2>
+                    <div id="preview-skills" class="mt-2 flex flex-wrap gap-2">
+                        <!-- Skill bubbles will be dynamically inserted here -->
+                    </div>
+                </div>
+
+                <!-- Experience -->
+                <div id="preview-experience-container" class="mt-6 hidden">
+                    <h2>Work Experience</h2>
+                    <div id="preview-experience-list" class="mt-2 space-y-4">
+                        <!-- Experience items will be dynamically inserted here -->
+                    </div>
+                </div>
+                
+                <!-- Projects -->
+                <div id="preview-projects-container" class="mt-6 hidden">
+                    <h2>Projects</h2>
+                    <div id="preview-projects-list" class="mt-2 space-y-4">
+                        <!-- Project items will be dynamically inserted here -->
+                    </div>
+                </div>
+                
+                <!-- Education -->
+                <div id="preview-education-container" class="mt-6 hidden">
+                    <h2>Education</h2>
+                    <div id="preview-education-list" class="mt-2 space-y-3">
+                        <!-- Education items will be dynamically inserted here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+    
+    <!-- === Modals === -->
+
+    <!-- Auth Modal (Login/Register) -->
+    <div id="auth-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-md relative">
+            <button class="modal-close-btn absolute top-4 right-4 text-gray-500 hover:text-gray-800 text-2xl">&times;</button>
+            
+            <!-- Tabs -->
+            <div class="flex border-b mb-6">
+                <button id="login-tab" class="flex-1 py-2 text-center font-medium text-blue-600 border-b-2 border-blue-600">Login</button>
+                <button id="register-tab" class="flex-1 py-2 text-center font-medium text-gray-500">Register</button>
+            </div>
+
+            <!-- Login Form -->
+            <form id="login-form" class="space-y-4">
+                <input type="email" id="login-email" placeholder="Email" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" required>
+                <input type="password" id="login-password" placeholder="Password" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" required>
+                <button type="submit" class="w-full bg-blue-600 text-white p-3 rounded-lg font-medium hover:bg-blue-700">Login</button>
+                <p id="login-error" class="text-red-500 text-sm text-center"></p>
+            </form>
+
+            <!-- Register Form (hidden by default) -->
+            <form id="register-form" class="space-y-4 hidden">
+                <input type="email" id="register-email" placeholder="Email" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" required>
+                <input type="password" id="register-password" placeholder="Password (min. 6 characters)" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" required>
+                <button type="submit" class="w-full bg-blue-600 text-white p-3 rounded-lg font-medium hover:bg-blue-700">Create Account</button>
+                <p id="register-error" class="text-red-500 text-sm text-center"></p>
+            </form>
+        </div>
+    </div>
+
+    <!-- ATS Score Checker Modal -->
+    <div id="ats-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-2xl relative max-h-[90vh] flex flex-col">
+            <button class="modal-close-btn absolute top-4 right-4 text-gray-500 hover:text-gray-800 text-2xl">&times;</button>
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">ATS Score Checker</h2>
+            <p class="text-gray-600 mb-4">Paste a job description below to see how well your resume matches.</p>
+            
+            <textarea id="job-description" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none h-48 resize-none" placeholder="Paste the job description here..."></textarea>
+            
+            <button id="run-ats-check-btn" class="w-full bg-indigo-600 text-white p-3 rounded-lg font-medium hover:bg-indigo-700 mt-4">Analyze Resume</button>
+            
+            <div id="ats-loading" class="mx-auto my-8 hidden">
+                <div class="spinner"></div>
+                <p class="text-gray-600 mt-2">Analyzing...</p>
+            </div>
+            
+            <div id="ats-result-container" class="mt-6 overflow-y-auto">
+                <h3 class="text-xl font-semibold text-gray-700">Analysis Result:</h3>
+                <div id="ats-result" class="mt-2 p-4 bg-gray-50 rounded-lg prose max-w-none prose-sm">
+                    <!-- AI response will be injected here -->
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Generic Message Modal -->
+    <div id="message-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-sm relative text-center">
+            <h3 id="message-title" class="text-xl font-semibold text-gray-800 mb-4">Message</h3>
+            <p id="message-body" class="text-gray-600 mb-6"></p>
+            <button class="modal-close-btn bg-blue-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-blue-700">OK</button>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script type="module">
+        // Import Firebase modules
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { 
+            getAuth, 
+            signInAnonymously, 
+            signInWithCustomToken, 
+            onAuthStateChanged,
+            createUserWithEmailAndPassword,
+            signInWithEmailAndPassword,
+            signOut
+        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { 
+            getFirestore, 
+            doc, 
+            setDoc, 
+            getDoc,
+            onSnapshot,
+            setLogLevel
+        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // --- Global Variables ---
+        let db, auth, app;
+        let userId = null;
+        let isAuthReady = false;
+        let resumeUnsubscribe = null; // To detach Firestore listener
+        
+        // Default resume data structure
+        let resumeData = {
+            personal: { name: '', email: '', phone: '', linkedin: '', portfolio: '', summary: '' },
+            education: [],
+            experience: [],
+            projects: [],
+            skills: ''
+        };
+
+        // --- Config and Initialization ---
+        
+        // Use environment variables provided by the platform
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+        
+        // Enable Firestore debugging
+        setLogLevel('Debug');
+
+        try {
+            app = initializeApp(firebaseConfig);
+            db = getFirestore(app);
+            auth = getAuth(app);
+            console.log("Firebase initialized successfully.");
+        } catch (e) {
+            console.error("Error initializing Firebase:", e);
+            showMessageModal("Initialization Error", "Could not connect to services. Please refresh.");
+        }
+
+        // --- Authentication ---
+        
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                userId = user.uid;
+                isAuthReady = true;
+                console.log("User is signed in:", userId);
+                updateUIForUser(user);
+                loadResumeData(user); // Load data once user is authenticated
+            } else {
+                // User is signed out, detach listener
+                if (resumeUnsubscribe) {
+                    resumeUnsubscribe();
+                    resumeUnsubscribe = null;
+                    console.log("Detached resume listener due to sign-out.");
+                }
+
+                // No user, try to sign in
+                if (initialAuthToken) {
+                    try {
+                        await signInWithCustomToken(auth, initialAuthToken);
+                        console.log("Signed in with custom token.");
+                    } catch (e) {
+                        console.error("Custom token sign-in failed:", e);
+                        await signInAnonymously(auth); // Fallback to anonymous
+                    }
+                } else {
+                    try {
+                        await signInAnonymously(auth);
+                        console.log("Signed in anonymously.");
+                    } catch (e) {
+                        console.error("Anonymous sign-in failed:", e);
+                    }
+                }
+            }
+        });
+
+        function updateUIForUser(user) {
+            const loginNavBtn = document.getElementById('login-nav-btn');
+            const registerNavBtn = document.getElementById('register-nav-btn');
+            const logoutBtn = document.getElementById('logout-btn');
+            const userEmailEl = document.getElementById('user-email');
+            const saveBtn = document.getElementById('save-btn');
+            const atsCheckBtn = document.getElementById('ats-check-btn');
+            
+            if (user && !user.isAnonymous) {
+                userEmailEl.textContent = user.email;
+                userEmailEl.classList.remove('hidden');
+                logoutBtn.classList.remove('hidden');
+                saveBtn.classList.remove('hidden');
+                atsCheckBtn.classList.remove('hidden');
+                loginNavBtn.classList.add('hidden');
+                registerNavBtn.classList.add('hidden');
+            } else {
+                userEmailEl.classList.add('hidden');
+                logoutBtn.classList.add('hidden');
+                saveBtn.classList.add('hidden');
+                atsCheckBtn.classList.add('hidden');
+                loginNavBtn.classList.remove('hidden');
+                registerNavBtn.classList.remove('hidden');
+                if (user && user.isAnonymous) {
+                    console.log("User is anonymous. Hiding cloud features.");
+                }
+            }
+        }
+        
+        // --- Modal Handling ---
+        
+        function showModal(id) {
+            document.getElementById(id).classList.remove('hidden');
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.add('hidden');
+        }
+
+        function showMessageModal(title, message) {
+            document.getElementById('message-title').textContent = title;
+            document.getElementById('message-body').textContent = message;
+            showModal('message-modal');
+        }
+
+        // Auth modal tab switching
+        const loginTab = document.getElementById('login-tab');
+        const registerTab = document.getElementById('register-tab');
+        const loginForm = document.getElementById('login-form');
+        const registerForm = document.getElementById('register-form');
+
+        loginTab.addEventListener('click', () => {
+            loginTab.classList.add('text-blue-600', 'border-blue-600');
+            registerTab.classList.remove('text-blue-600', 'border-blue-600');
+            registerTab.classList.add('text-gray-500');
+            loginForm.classList.remove('hidden');
+            registerForm.classList.add('hidden');
+        });
+
+        registerTab.addEventListener('click', () => {
+            registerTab.classList.add('text-blue-600', 'border-blue-600');
+            loginTab.classList.remove('text-blue-600', 'border-blue-600');
+            loginTab.classList.add('text-gray-500');
+            registerForm.classList.remove('hidden');
+            loginForm.classList.add('hidden');
+        });
+
+        // Close modal buttons
+        document.querySelectorAll('.modal-close-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                btn.closest('.fixed').classList.add('hidden');
+            });
+        });
+        
+        // Nav button listeners
+        document.getElementById('login-nav-btn').addEventListener('click', () => showModal('auth-modal'));
+        document.getElementById('register-nav-btn').addEventListener('click', () => {
+            registerTab.click();
+            showModal('auth-modal');
+        });
+        document.getElementById('ats-check-btn').addEventListener('click', () => showModal('ats-modal'));
+        document.getElementById('logout-btn').addEventListener('click', () => {
+            if (resumeUnsubscribe) { // Detach listener on logout
+                resumeUnsubscribe();
+                resumeUnsubscribe = null;
+                console.log("Detached resume listener on logout click.");
+            }
+            signOut(auth);
+            // Reset to default state
+            resumeData = { personal: {}, education: [], experience: [], projects: [], skills: '' };
+            renderForm();
+            renderPreview();
+        });
+
+        // --- Auth Form Submissions ---
+        
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('login-email').value;
+            const pass = document.getElementById('login-password').value;
+            const errorEl = document.getElementById('login-error');
+            errorEl.textContent = '';
+            
+            try {
+                await signInWithEmailAndPassword(auth, email, pass);
+                closeModal('auth-modal');
+                errorEl.textContent = '';
+                loginForm.reset();
+            } catch (error) {
+                console.error("Login failed:", error.message);
+                errorEl.textContent = error.message;
+            }
+        });
+        
+        registerForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('register-email').value;
+            const pass = document.getElementById('register-password').value;
+            const errorEl = document.getElementById('register-error');
+            errorEl.textContent = '';
+
+            try {
+                await createUserWithEmailAndPassword(auth, email, pass);
+                closeModal('auth-modal');
+                errorEl.textContent = '';
+                registerForm.reset();
+            } catch (error) {
+                console.error("Registration failed:", error.message);
+                errorEl.textContent = error.message;
+            }
+        });
+
+        // --- Firestore Data Sync ---
+        
+        async function saveResumeData() {
+            if (!userId || !isAuthReady || auth.currentUser.isAnonymous) {
+                showMessageModal("Not Signed In", "Please log in or register to save your resume to the cloud.");
+                return;
+            }
+            
+            // First, update resumeData from the form
+            updateDataFromForm();
+            
+            const resumeRef = doc(db, 'artifacts', appId, 'users', userId, 'resume', 'data');
+            try {
+                await setDoc(resumeRef, resumeData);
+                showMessageModal("Success", "Your resume has been saved to the cloud!");
+            } catch (e) {
+                console.error("Error saving resume:", e);
+                showMessageModal("Error", "Could not save resume. Please try again.");
+            }
+        }
+        
+        function loadResumeData(user) { // Accept user object
+            // Use the passed user object for the check
+            if (!user || !user.uid || user.isAnonymous) {
+                console.log("User not logged in or is anonymous, not loading data.");
+                // Ensure form is rendered with default data
+                renderForm();
+                renderPreview();
+                return;
+            }
+
+            // Detach any existing listener before attaching a new one
+            if (resumeUnsubscribe) {
+                resumeUnsubscribe();
+                resumeUnsubscribe = null;
+                console.log("Detached old listener before loading new data.");
+            }
+
+            const resumeRef = doc(db, 'artifacts', appId, 'users', user.uid, 'resume', 'data');
+            
+            resumeUnsubscribe = onSnapshot(resumeRef, (docSnap) => {
+                if (docSnap.exists()) {
+                    console.log("Loading data from Firestore...");
+                    resumeData = docSnap.data();
+                    // Ensure all parts of the data structure are present
+                    resumeData.personal = resumeData.personal || {};
+                    resumeData.education = resumeData.education || [];
+                    resumeData.experience = resumeData.experience || [];
+                    resumeData.projects = resumeData.projects || [];
+                    resumeData.skills = resumeData.skills || '';
+                } else {
+                    console.log("No resume data found in Firestore, using default.");
+                    resumeData = { personal: {}, education: [], experience: [], projects: [], skills: '' };
+                }
+                // Render both form and preview with the loaded data
+                renderForm();
+                renderPreview();
+            }, (error) => {
+                console.error("Error listening to resume data:", error);
+            });
+        }
+        
+        document.getElementById('save-btn').addEventListener('click', saveResumeData);
+
+        // --- Dynamic Form & Preview Rendering ---
+        
+        // Main function to update resumeData object from form inputs
+        function updateDataFromForm() {
+            resumeData.personal = {
+                name: document.getElementById('name').value,
+                email: document.getElementById('email').value,
+                phone: document.getElementById('phone').value,
+                linkedin: document.getElementById('linkedin').value,
+                portfolio: document.getElementById('portfolio').value,
+                summary: document.getElementById('summary').value
+            };
+            
+            resumeData.skills = document.getElementById('skills').value;
+
+            // Update dynamic lists
+            resumeData.education = [];
+            document.querySelectorAll('.education-item').forEach(item => {
+                resumeData.education.push({
+                    school: item.querySelector('[data-key="school"]').value,
+                    degree: item.querySelector('[data-key="degree"]').value,
+                    dates: item.querySelector('[data-key="dates"]').value,
+                    location: item.querySelector('[data-key="location"]').value
+                });
+            });
+
+            resumeData.experience = [];
+            document.querySelectorAll('.experience-item').forEach(item => {
+                resumeData.experience.push({
+                    company: item.querySelector('[data-key="company"]').value,
+                    role: item.querySelector('[data-key="role"]').value,
+                    dates: item.querySelector('[data-key="dates"]').value,
+                    location: item.querySelector('[data-key="location"]').value,
+                    bullets: item.querySelector('[data-key="bullets"]').value
+                });
+            });
+            
+            resumeData.projects = [];
+            document.querySelectorAll('.project-item').forEach(item => {
+                resumeData.projects.push({
+                    title: item.querySelector('[data-key="title"]').value,
+                    link: item.querySelector('[data-key="link"]').value,
+                    description: item.querySelector('[data-key="description"]').value,
+                });
+            });
+        }
+
+        // Main function to update the live preview from resumeData object
+        function renderPreview() {
+            const p = resumeData.personal;
+            
+            // Personal
+            document.getElementById('preview-name').textContent = p.name || 'Your Name';
+            const contactHTML = [p.email, p.phone, p.linkedin, p.portfolio].filter(Boolean).map(item => `<span>${item}</span>`).join(' &bull; ');
+            document.getElementById('preview-contact').innerHTML = contactHTML;
+
+            // Summary
+            const summaryContainer = document.getElementById('preview-summary-container');
+            if (p.summary) {
+                document.getElementById('preview-summary').innerText = p.summary;
+                summaryContainer.classList.remove('hidden');
+            } else {
+                summaryContainer.classList.add('hidden');
+            }
+
+            // Skills
+            const skillsContainer = document.getElementById('preview-skills-container');
+            const skillsList = document.getElementById('preview-skills');
+            if (resumeData.skills) {
+                skillsList.innerHTML = resumeData.skills.split(',')
+                    .map(s => s.trim())
+                    .filter(Boolean)
+                    .map(skill => `<span class="bg-blue-100 text-blue-800 text-sm font-medium px-3 py-1 rounded-full">${skill}</span>`)
+                    .join('');
+                skillsContainer.classList.remove('hidden');
+            } else {
+                skillsList.innerHTML = '';
+                skillsContainer.classList.add('hidden');
+            }
+            
+            // Experience
+            const expContainer = document.getElementById('preview-experience-container');
+            const expList = document.getElementById('preview-experience-list');
+            if (resumeData.experience.length > 0) {
+                expList.innerHTML = resumeData.experience.map(item => `
+                    <div class="mt-3">
+                        <div class="flex justify-between items-baseline">
+                            <h3>${item.role || 'Job Role'}</h3>
+                            <span class="text-sm font-medium text-gray-600">${item.dates || 'Dates'}</span>
+                        </div>
+                        <div class="flex justify-between items-baseline">
+                            <p class="font-medium text-gray-700">${item.company || 'Company Name'}</p>
+                            <span class="text-sm text-gray-500">${item.location || 'Location'}</span>
+                        </div>
+                        <ul class="list-disc list-inside mt-2 text-gray-700 space-y-1">
+                            ${(item.bullets || '').split('\n').filter(Boolean).map(bullet => `<li>${bullet}</li>`).join('')}
+                        </ul>
+                    </div>
+                `).join('');
+                expContainer.classList.remove('hidden');
+            } else {
+                expList.innerHTML = '';
+                expContainer.classList.add('hidden');
+            }
+            
+            // Projects
+            const projContainer = document.getElementById('preview-projects-container');
+            const projList = document.getElementById('preview-projects-list');
+            if (resumeData.projects.length > 0) {
+                projList.innerHTML = resumeData.projects.map(item => `
+                    <div class="mt-3">
+                        <div class="flex justify-between items-baseline">
+                            <h3>${item.title || 'Project Title'}</h3>
+                            ${item.link ? `<a href="${item.link}" target="_blank" class="text-sm text-blue-600 hover:underline">View Project</a>` : ''}
+                        </div>
+                        <p class="mt-1 text-gray-700">${item.description || 'Project description...'}</p>
+                    </div>
+                `).join('');
+                projContainer.classList.remove('hidden');
+            } else {
+                projList.innerHTML = '';
+                projContainer.classList.add('hidden');
+            }
+
+            // Education
+            const eduContainer = document.getElementById('preview-education-container');
+            const eduList = document.getElementById('preview-education-list');
+            if (resumeData.education.length > 0) {
+                eduList.innerHTML = resumeData.education.map(item => `
+                    <div>
+                        <div class="flex justify-between items-baseline">
+                            <h3>${item.degree || 'Degree'}</h3>
+                            <span class="text-sm font-medium text-gray-600">${item.dates || 'Dates'}</span>
+                        </div>
+                        <div class="flex justify-between items-baseline">
+                            <p class="font-medium text-gray-700">${item.school || 'School Name'}</p>
+                            <span class="text-sm text-gray-500">${item.location || 'Location'}</span>
+                        </div>
+                    </div>
+                `).join('');
+                eduContainer.classList.remove('hidden');
+            } else {
+                eduList.innerHTML = '';
+                eduContainer.classList.add('hidden');
+            }
+        }
+        
+        // Function to re-render the dynamic FORM sections from resumeData
+        function renderForm() {
+            // Personal
+            const p = resumeData.personal || {};
+            document.getElementById('name').value = p.name || '';
+            document.getElementById('email').value = p.email || '';
+            document.getElementById('phone').value = p.phone || '';
+            document.getElementById('linkedin').value = p.linkedin || '';
+            document.getElementById('portfolio').value = p.portfolio || '';
+            document.getElementById('summary').value = p.summary || '';
+            
+            // Skills
+            document.getElementById('skills').value = resumeData.skills || '';
+            
+            // Education
+            const eduList = document.getElementById('education-form-list');
+            eduList.innerHTML = resumeData.education.map((item, index) => `
+                <div class="education-item border p-4 rounded-lg relative space-y-3 bg-gray-50">
+                    <button type="button" class="remove-item-btn absolute top-2 right-2 text-red-500 hover:text-red-700 font-bold" data-type="education" data-index="${index}">&times;</button>
+                    <input type="text" data-key="school" value="${item.school || ''}" placeholder="School/University" class="w-full p-2 border border-gray-300 rounded-lg">
+                    <input type="text" data-key="degree" value="${item.degree || ''}" placeholder="Degree (e.g., B.S. in Computer Science)" class="w-full p-2 border border-gray-300 rounded-lg">
+                    <div class="grid grid-cols-2 gap-3">
+                        <input type="text" data-key="dates" value="${item.dates || ''}" placeholder="Dates (e.g., 2020 - 2024)" class="w-full p-2 border border-gray-300 rounded-lg">
+                        <input type="text" data-key="location" value="${item.location || ''}" placeholder="Location (e.g., New York, NY)" class="w-full p-2 border border-gray-300 rounded-lg">
+                    </div>
+                </div>
+            `).join('');
+
+            // Experience
+            const expList = document.getElementById('experience-form-list');
+            expList.innerHTML = resumeData.experience.map((item, index) => `
+                <div class="experience-item border p-4 rounded-lg relative space-y-3 bg-gray-50">
+                    <button type="button" class="remove-item-btn absolute top-2 right-2 text-red-500 hover:text-red-700 font-bold" data-type="experience" data-index="${index}">&times;</button>
+                    <input type="text" data-key="company" value="${item.company || ''}" placeholder="Company" class="w-full p-2 border border-gray-300 rounded-lg">
+                    <input type="text" data-key="role" value="${item.role || ''}" placeholder="Job Role" class="w-full p-2 border border-gray-300 rounded-lg">
+                    <div class="grid grid-cols-2 gap-3">
+                        <input type="text" data-key="dates" value="${item.dates || ''}" placeholder="Dates (e.g., Jan 2022 - Present)" class="w-full p-2 border border-gray-300 rounded-lg">
+                        <input type="text" data-key="location" value="${item.location || ''}" placeholder="Location (e.g., Remote)" class="w-full p-2 border border-gray-300 rounded-lg">
+                    </div>
+                    <textarea data-key="bullets" placeholder="Accomplishments (one per line)..." class="w-full p-2 border border-gray-300 rounded-lg h-24 resize-none">${item.bullets || ''}</textarea>
+                </div>
+            `).join('');
+            
+            // Projects
+            const projList = document.getElementById('projects-form-list');
+            projList.innerHTML = resumeData.projects.map((item, index) => `
+                <div class="project-item border p-4 rounded-lg relative space-y-3 bg-gray-50">
+                    <button type="button" class="remove-item-btn absolute top-2 right-2 text-red-500 hover:text-red-700 font-bold" data-type="projects" data-index="${index}">&times;</button>
+                    <input type="text" data-key="title" value="${item.title || ''}" placeholder="Project Title" class="w-full p-2 border border-gray-300 rounded-lg">
+                    <input type="text" data-key="link" value="${item.link || ''}" placeholder="Project Link" class="w-full p-2 border border-gray-300 rounded-lg">
+                    <textarea data-key="description" placeholder="Project description..." class="w-full p-2 border border-gray-300 rounded-lg h-20 resize-none">${item.description || ''}</textarea>
+                </div>
+            `).join('');
+        }
+        
+        // --- Event Listeners for Dynamic Content ---
+        
+        // Add item buttons
+        document.getElementById('add-education-btn').addEventListener('click', () => {
+            resumeData.education.push({});
+            renderForm();
+        });
+        
+        document.getElementById('add-experience-btn').addEventListener('click', () => {
+            resumeData.experience.push({});
+            renderForm();
+        });
+        
+        document.getElementById('add-project-btn').addEventListener('click', () => {
+            resumeData.projects.push({});
+            renderForm();
+        });
+        
+        // Remove item buttons (using event delegation)
+        document.getElementById('resume-form').addEventListener('click', (e) => {
+            if (e.target.classList.contains('remove-item-btn')) {
+                const type = e.target.dataset.type;
+                const index = parseInt(e.target.dataset.index, 10);
+                
+                if (type && !isNaN(index) && resumeData[type]) {
+                    resumeData[type].splice(index, 1);
+                    renderForm(); // Re-render form
+                    renderPreview(); // Re-render preview
+                }
+            }
+        });
+
+        // Main live-update listener
+        document.getElementById('resume-form').addEventListener('input', () => {
+            updateDataFromForm();
+            renderPreview();
+        });
+
+        // --- PDF Download ---
+        
+        document.getElementById('download-pdf-btn').addEventListener('click', () => {
+            const { jsPDF } = window.jspdf;
+            const resumeElement = document.getElementById('resume-preview');
+            
+            // Temporarily remove shadow for cleaner PDF
+            const originalShadow = resumeElement.style.boxShadow;
+            resumeElement.style.boxShadow = 'none';
+
+            html2canvas(resumeElement, {
+                scale: 2, // Improve quality
+                useCORS: true,
+                windowWidth: resumeElement.scrollWidth,
+                windowHeight: resumeElement.scrollHeight
+            }).then(canvas => {
+                // Restore shadow
+                resumeElement.style.boxShadow = originalShadow;
+
+                const imgData = canvas.toDataURL('image/png');
+                
+                // Calculate dimensions for PDF
+                // Using US Letter size (8.5 x 11 inches)
+                const pdfWidth = 215.9; // mm
+                const pdfHeight = 279.4; // mm
+                
+                // Calculate image dimensions to fit PDF
+                const imgProps = canvas;
+                const imgWidth = imgProps.width;
+                const imgHeight = imgProps.height;
+                
+                const ratio = imgHeight / imgWidth;
+                let finalImgWidth = pdfWidth;
+                let finalImgHeight = pdfWidth * ratio;
+
+                // If image height is still too tall, scale by height
+                if (finalImgHeight > pdfHeight) {
+                    finalImgHeight = pdfHeight;
+                    finalImgWidth = pdfHeight / ratio;
+                }
+                
+                // Center the image on the PDF
+                const x = (pdfWidth - finalImgWidth) / 2;
+                const y = 0; // Start at top
+
+                const pdf = new jsPDF({
+                    orientation: 'p',
+                    unit: 'mm',
+                    format: 'letter'
+                });
+                
+                pdf.addImage(imgData, 'PNG', x, y, finalImgWidth, finalImgHeight);
+                pdf.save('resume.pdf');
+            }).catch(err => {
+                console.error("Error generating PDF:", err);
+                showMessageModal("PDF Error", "Could not generate PDF. Please try again.");
+                // Restore shadow on error
+                resumeElement.style.boxShadow = originalShadow;
+            });
+        });
+
+        // --- ATS Checker (Gemini AI) ---
+        
+        // Function to extract text from the resume preview
+        function getResumeText() {
+            const preview = document.getElementById('resume-preview');
+            // Use innerText to get a reasonable text representation
+            return preview.innerText;
+        }
+
+        async function runATSCheck() {
+            const jobDescription = document.getElementById('job-description').value;
+            const resumeText = getResumeText();
+            
+            if (!jobDescription) {
+                document.getElementById('ats-result').innerHTML = '<p class="text-red-500">Please paste a job description first.</p>';
+                return;
+            }
+            
+            document.getElementById('ats-loading').classList.remove('hidden');
+            document.getElementById('ats-result-container').classList.add('hidden');
+            document.getElementById('ats-result').innerHTML = '';
+
+            const systemPrompt = `You are an expert ATS (Applicant Tracking System) reviewer and professional resume writer. Your task is to analyze a resume against a job description.
+
+Provide a concise, actionable analysis in Markdown format. Follow this structure:
+1.  **Overall Match Score:** (e.g., 75/100).
+2.  **Keyword Analysis:** List key missing keywords from the job description and suggest where to add them.
+3.  **Strengths:** What parts of the resume match the job well.
+4.  **Areas for Improvement:** Specific, actionable advice on how to tailor the resume better (e.g., "Rephrase bullet point 'X' to 'Y' to highlight 'Z' skill").
+5.  **Formatting & Readability:** A brief note on ATS-friendliness (e.g., "Clear formatting, easy to parse.").`;
+            
+            const userQuery = `JOB DESCRIPTION:
+---
+${jobDescription}
+---
+
+RESUME:
+---
+${resumeText}
+---
+
+Provide your ATS analysis based on the system instructions.`;
+            
+            const apiKey = ""; // API key is handled by the platform
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+            
+            const payload = {
+                contents: [{ parts: [{ text: userQuery }] }],
+                systemInstruction: {
+                    parts: [{ text: systemPrompt }]
+                },
+            };
+            
+            try {
+                // Implement exponential backoff for retries
+                let response;
+                let retries = 0;
+                const maxRetries = 3;
+                let delay = 1000;
+
+                while (retries < maxRetries) {
+                    response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (response.ok) {
+                        break; // Success
+                    }
+                    
+                    if (response.status === 429 || response.status >= 500) {
+                        // Throttling or server error, wait and retry
+                        console.warn(`Attempt ${retries + 1} failed with status ${response.status}. Retrying in ${delay}ms...`);
+                        await new Promise(res => setTimeout(res, delay));
+                        delay *= 2; // Exponential backoff
+                        retries++;
+                    } else {
+                        // Client error (e.g., 400), don't retry
+                        throw new Error(`API request failed with status ${response.status}: ${response.statusText}`);
+                    }
+                }
+                
+                if (!response.ok) {
+                    throw new Error(`API request failed after ${maxRetries} attempts.`);
+                }
+                
+                const result = await response.json();
+                const text = result.candidates?.[0]?.content?.parts?.[0]?.text;
+
+                if (text) {
+                    // This is a simple markdown-to-HTML converter.
+                    // For a real app, a library like 'marked' would be better.
+                    let html = text
+                        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') // Bold
+                        .replace(/\*(.*?)\*/g, '<em>$1</em>')     // Italic
+                        .replace(/^(#+\s.*)/gm, (match, p1) => { // Headers
+                            const level = p1.match(/^#+/)[0].length;
+                            return `<h${level + 1} class="text-lg font-semibold mt-4">${p1.replace(/^#+\s/, '')}</h${level + 1}>`;
+                        })
+                        .replace(/^(1\.\s.*|2\.\s.*|3\.\s.*|4\.\s.*|5\.\s.*)/gm, (match) => { // Simple ordered list
+                            if (!match.startsWith('<ol>')) {
+                                return '<ol class="list-decimal list-inside space-y-1">' + `<li>${match.replace(/^\d\.\s/, '')}</li>` + '</ol>';
+                            }
+                            return `<li>${match.replace(/^\d\.\s/, '')}</li>`;
+                        })
+                        .replace(/<\/ol>\s*<ol.*?>/g, '') // Fix adjacent lists
+                        .replace(/^(\-\s.*)/gm, (match) => { // Simple unordered list
+                             if (!match.startsWith('<ul>')) {
+                                return '<ul class="list-disc list-inside space-y-1">' + `<li>${match.replace(/^\-\s/, '')}</li>` + '</ul>';
+                            }
+                            return `<li>${match.replace(/^\-\s/, '')}</li>`;
+                        })
+                        .replace(/<\/ul>\s*<ul.*?>/g, '') // Fix adjacent lists
+                        .replace(/\n/g, '<br>'); // Newlines
+
+                    document.getElementById('ats-result').innerHTML = html;
+                } else {
+                    throw new Error("No text content in API response.");
+                }
+                
+            } catch (error) {
+                console.error("ATS Check Error:", error);
+                document.getElementById('ats-result').innerHTML = `<p class="text-red-500">An error occurred while analyzing your resume. Please try again later. ${error.message}</p>`;
+            } finally {
+                document.getElementById('ats-loading').classList.add('hidden');
+                document.getElementById('ats-result-container').classList.remove('hidden');
+            }
+        }
+        
+        document.getElementById('run-ats-check-btn').addEventListener('click', runATSCheck);
+
+        // --- Initial Load ---
+        // Render the empty form and preview on initial page load
+        renderForm();
+        renderPreview();
+        
+    </script>
+</body>
+</html>
