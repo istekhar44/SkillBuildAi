@@ -2,69 +2,47 @@ import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import NavBar from '../components/NavBar';
 import Footer from '../components/Footer';
-import JobCard from '../components/JobCard';
-
-const categories = ['Software Development', 'Data Science', 'Design', 'Marketing', 'Sales', 'Management', 'Finance', 'Healthcare', 'Education', 'Engineering'];
-const locations = ['Remote', 'New York', 'San Francisco', 'London', 'Berlin', 'Tokyo'];
+import { jobListings, categories, locations } from '../data/jobs';
+import { MapPin, Briefcase, Clock, Search, SlidersHorizontal } from 'lucide-react';
 
 const BrowsePage = () => {
     const location = useLocation();
     const [selectedCategory, setSelectedCategory] = useState('');
     const [selectedLocation, setSelectedLocation] = useState('');
     const [searchQuery, setSearchQuery] = useState('');
-    const [jobs, setJobs] = useState([]);
-    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         if (location.state?.searchQuery) {
             setSearchQuery(location.state.searchQuery);
         }
-
-        // Also check if category was passed in URL params
         const params = new URLSearchParams(location.search);
         const cat = params.get('category');
         if (cat) setSelectedCategory(cat);
     }, [location]);
 
-    useEffect(() => {
-        // Fetch jobs from backend
-        const fetchJobs = async () => {
-            setLoading(true);
-            try {
-                const params = new URLSearchParams();
-                if (searchQuery) params.append('keyword', searchQuery);
-                if (selectedCategory) params.append('category', selectedCategory);
-                if (selectedLocation) params.append('location', selectedLocation);
-
-                const res = await fetch(`${import.meta.env.VITE_API_URL}/job/get?${params.toString()}`);
-                const data = await res.json();
-
-                if (data.success) {
-                    setJobs(data.jobs || []);
-                }
-            } catch (err) {
-                console.error('Failed to fetch jobs:', err);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchJobs();
-    }, [searchQuery, selectedCategory, selectedLocation]);
+    // Client-side filtering on local data
+    const filteredJobs = jobListings.filter(job => {
+        const matchesCategory = !selectedCategory || job.category === selectedCategory;
+        const matchesLocation = !selectedLocation || job.location === selectedLocation;
+        const matchesSearch = !searchQuery ||
+            job.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            job.company.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            job.skills?.some(s => s.toLowerCase().includes(searchQuery.toLowerCase()));
+        return matchesCategory && matchesLocation && matchesSearch;
+    });
 
     return (
         <div className="min-h-screen bg-premium-black font-sans text-white">
             <NavBar />
             <div className="max-w-7xl mx-auto px-6 py-12">
-                {/* Layout for Filter Sidebar and Job Grid */}
                 <div className="flex flex-col lg:flex-row gap-8">
 
                     {/* Filter Sidebar */}
                     <div className="w-full lg:w-72 bg-white/5 backdrop-blur-md border border-white/10 p-6 rounded-2xl h-fit sticky top-24">
-                        <h2 className="text-2xl font-bold mb-6 text-white font-serif">Filter Jobs</h2>
+                        <h2 className="text-2xl font-bold mb-6 text-white font-serif flex items-center gap-2"><SlidersHorizontal size={20} /> Filter Jobs</h2>
 
                         <div className="mb-8">
-                            <h3 className="font-semibold mb-4 text-lg text-gray-300 flex items-center gap-2">Category</h3>
+                            <h3 className="font-semibold mb-4 text-lg text-gray-300 flex items-center gap-2"><Briefcase size={16} /> Category</h3>
                             <label className="flex items-center gap-3 mb-3 cursor-pointer hover:bg-white/5 p-2 rounded">
                                 <input type="radio" name="category" value="" checked={selectedCategory === ''} onChange={(e) => setSelectedCategory(e.target.value)} className="w-4 h-4 accent-brand-purple" />
                                 <span className="text-gray-300 font-medium">All Categories</span>
@@ -78,7 +56,11 @@ const BrowsePage = () => {
                         </div>
 
                         <div className="border-t border-white/10 pt-6">
-                            <h3 className="font-semibold mb-4 text-lg text-gray-300 flex items-center gap-2">Location</h3>
+                            <h3 className="font-semibold mb-4 text-lg text-gray-300 flex items-center gap-2"><MapPin size={16} /> Location</h3>
+                            <label className="flex items-center gap-3 mb-3 cursor-pointer hover:bg-white/5 p-2 rounded">
+                                <input type="radio" name="location" value="" checked={selectedLocation === ''} onChange={(e) => setSelectedLocation(e.target.value)} className="w-4 h-4 accent-brand-purple" />
+                                <span className="text-gray-300 font-medium">All Locations</span>
+                            </label>
                             {locations.map((loc, idx) => (
                                 <label key={idx} className="flex items-center gap-3 mb-3 cursor-pointer hover:bg-white/5 p-2 rounded">
                                     <input type="radio" name="location" value={loc} checked={selectedLocation === loc} onChange={(e) => setSelectedLocation(e.target.value)} className="w-4 h-4 accent-brand-purple" />
@@ -95,14 +77,50 @@ const BrowsePage = () => {
                     {/* Main Content */}
                     <div className="flex-1">
                         <div className="mb-6 flex items-center justify-between">
-                            <h2 className="text-3xl font-bold text-white font-serif">{loading ? 'Loading...' : `${jobs.length} Jobs Found`}</h2>
-                            <input type="text" placeholder="Search..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-indigo-500 w-64" />
+                            <h2 className="text-3xl font-bold text-white font-serif">{filteredJobs.length} Jobs Found</h2>
+                            <div className="relative">
+                                <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
+                                <input type="text" placeholder="Search jobs..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="pl-9 pr-4 py-2 rounded-lg bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-indigo-500 w-64" />
+                            </div>
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                            {jobs.map(job => (<JobCard key={job._id} job={job} />))}
+                            {filteredJobs.map(job => (
+                                <div key={job.id} className="bg-white/5 backdrop-blur-md rounded-2xl p-6 border border-white/10 hover:border-indigo-500/50 hover:-translate-y-1 transition-all duration-300 group cursor-pointer">
+                                    <div className="flex items-start justify-between mb-4">
+                                        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-gray-800 to-black border border-white/10 flex items-center justify-center overflow-hidden">
+                                            <img
+                                                src={job.logo}
+                                                alt={job.company}
+                                                className="w-full h-full object-contain p-1.5"
+                                                onError={(e) => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'flex'; }}
+                                            />
+                                            <span style={{ display: 'none' }} className="w-full h-full items-center justify-center text-white font-bold text-lg">
+                                                {job.company[0]}
+                                            </span>
+                                        </div>
+                                        <span className="text-xs bg-indigo-500/20 text-indigo-400 px-2.5 py-1 rounded-full font-bold border border-indigo-500/30">{job.type}</span>
+                                    </div>
+                                    <h3 className="text-lg font-bold text-white mb-1 group-hover:text-indigo-300 transition-colors">{job.title}</h3>
+                                    <p className="text-gray-400 text-sm mb-3">{job.company}</p>
+                                    <p className="text-gray-500 text-xs mb-4 line-clamp-2">{job.description}</p>
+                                    <div className="flex flex-wrap gap-2 mb-4">
+                                        {job.skills?.map((skill, i) => (
+                                            <span key={i} className="text-xs bg-white/5 border border-white/10 text-gray-300 px-2 py-1 rounded-md">{skill}</span>
+                                        ))}
+                                    </div>
+                                    <div className="border-t border-white/5 pt-4 flex items-center justify-between text-xs text-gray-500">
+                                        <span className="flex items-center gap-1"><MapPin size={12} /> {job.location}</span>
+                                        <span className="flex items-center gap-1"><Clock size={12} /> {job.postedDate}</span>
+                                    </div>
+                                    <div className="flex items-center justify-between mt-3">
+                                        <span className="text-sm font-bold text-green-400">{job.salary}</span>
+                                        <span className="text-xs text-gray-500">{job.experience}</span>
+                                    </div>
+                                </div>
+                            ))}
                         </div>
 
-                        {jobs.length === 0 && !loading && (
+                        {filteredJobs.length === 0 && (
                             <div className="text-center py-20 text-gray-400">
                                 <p className="text-xl">No jobs found matching your criteria.</p>
                                 <button onClick={() => { setSearchQuery(''); setSelectedCategory(''); setSelectedLocation(''); }} className="text-indigo-400 mt-4 underline hover:text-indigo-300">Reset Filters</button>

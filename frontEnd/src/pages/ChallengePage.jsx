@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import NavBar from '../components/NavBar';
 import Footer from '../components/Footer';
 import { Trophy, Flame, Calendar, CheckCircle } from 'lucide-react';
@@ -7,6 +8,7 @@ const ChallengePage = () => {
     // State for tracking progress
     const [progress, setProgress] = useState(0);
     const [completedDays, setCompletedDays] = useState([]);
+    const navigate = useNavigate();
 
     // Load progress from local storage
     useEffect(() => {
@@ -80,10 +82,10 @@ const ChallengePage = () => {
                             {Array.from({ length: 100 }, (_, i) => i + 1).map(day => (
                                 <button
                                     key={day}
-                                    onClick={() => toggleDay(day)}
+                                    onClick={() => navigate(`/challenge/${day}`)}
                                     className={`aspect-square rounded-xl flex items-center justify-center text-sm font-bold transition-all transform hover:scale-105 border ${completedDays.includes(day)
-                                            ? 'bg-green-500 text-black border-green-400 shadow-[0_0_10px_#22c55e]'
-                                            : 'bg-black/30 text-gray-500 border-white/5 hover:bg-white/10 hover:text-white hover:border-white/20'
+                                        ? 'bg-green-500 text-black border-green-400 shadow-[0_0_10px_#22c55e]'
+                                        : 'bg-black/30 text-gray-500 border-white/5 hover:bg-white/10 hover:text-white hover:border-white/20'
                                         }`}
                                 >
                                     {day}

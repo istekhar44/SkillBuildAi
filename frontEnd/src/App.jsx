@@ -11,6 +11,8 @@ import ChallengePage from './pages/ChallengePage';
 import RecruiterDashboard from './pages/RecruiterDashboard';
 import PostJob from './pages/PostJob';
 import CandidatePipeline from './pages/CandidatePipeline';
+import MockTestPage from './pages/MockTestPage';
+import CodingChallengePage from './pages/CodingChallengePage';
 
 const App = () => {
   return (
@@ -22,9 +24,11 @@ const App = () => {
       <Route path="/resume-builder" element={<ResumeBuilder />} />
       <Route path="/learning" element={<LearningPage />} />
       <Route path="/challenge" element={<ChallengePage />} />
+      <Route path="/challenge/:day" element={<CodingChallengePage />} />
       <Route path="/recruiter" element={<RecruiterDashboard />} />
       <Route path="/post-job" element={<PostJob />} />
       <Route path="/pipeline" element={<CandidatePipeline />} />
+      <Route path="/mock-test/:companySlug" element={<MockTestPage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
       <Route path="/about" element={<AboutPage />} />

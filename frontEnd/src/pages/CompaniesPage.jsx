@@ -42,8 +42,18 @@ const CompaniesPage = () => {
                             <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-indigo-500 to-purple-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></div>
 
                             <div className="flex items-start justify-between mb-6">
-                                <div className={`w-16 h-16 rounded-2xl flex items-center justify-center text-3xl font-bold text-white shadow-inner border border-white/10 bg-gradient-to-br from-gray-800 to-black`}>
-                                    {company.logo}
+                                <div className={`w-16 h-16 rounded-2xl flex items-center justify-center text-3xl font-bold text-white shadow-inner border border-white/10 bg-gradient-to-br from-gray-800 to-black overflow-hidden`}>
+                                    {company.logoUrl ? (
+                                        <img
+                                            src={company.logoUrl}
+                                            alt={company.name}
+                                            className="w-full h-full object-contain p-2"
+                                            onError={(e) => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'flex'; }}
+                                        />
+                                    ) : null}
+                                    <span style={{ display: company.logoUrl ? 'none' : 'flex' }} className="w-full h-full items-center justify-center">
+                                        {company.logo}
+                                    </span>
                                 </div>
                                 <span className="bg-white/10 border border-white/10 text-white text-xs font-bold px-3 py-1 rounded-full backdrop-blur-sm">
                                     {company.jobsOpen} Jobs
@@ -58,9 +68,9 @@ const CompaniesPage = () => {
                                 <span>{company.location}</span>
                             </div>
 
-                            <button className="w-full mt-6 py-3 border border-white/10 text-white font-bold rounded-xl hover:bg-white hover:text-black transition-all duration-300 text-sm shadow-lg">
+                            <a href={company.careerUrl} target="_blank" rel="noopener noreferrer" className="block w-full mt-6 py-3 border border-white/10 text-white font-bold rounded-xl hover:bg-white hover:text-black transition-all duration-300 text-sm shadow-lg text-center">
                                 View Details
-                            </button>
+                            </a>
                         </div>
                     ))}
                 </div>
