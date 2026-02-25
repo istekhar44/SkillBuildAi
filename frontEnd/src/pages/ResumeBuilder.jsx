@@ -156,7 +156,7 @@ const ResumeBuilder = () => {
     };
 
     return (
-        <div className="min-h-screen bg-premium-black font-sans text-white">
+        <div className="min-h-screen font-sans" style={{ backgroundColor: 'var(--bg-primary)', color: 'var(--text-primary)' }}>
             <NavBar />
 
             <div className="max-w-7xl mx-auto px-4 lg:px-6 py-8">

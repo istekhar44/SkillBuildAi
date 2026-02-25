@@ -1,81 +1,120 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import NavBar from '../components/NavBar';
 import Footer from '../components/Footer';
-import { companies } from '../data/companies';
-import { MapPin, Briefcase, Search } from 'lucide-react';
+import { Building2, MapPin, Users, Briefcase, Search } from 'lucide-react';
+import { companies as staticCompanies } from '../data/companies';
+
+const API = import.meta.env.VITE_API_URL || 'http://localhost:5011';
 
 const CompaniesPage = () => {
+    const [companies, setCompanies] = useState([]);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [loading, setLoading] = useState(true);
+    const [usingApi, setUsingApi] = useState(false);
+
+    useEffect(() => {
+        const fetchCompanies = async () => {
+            setLoading(true);
+            try {
+                const params = searchTerm ? `?search=${encodeURIComponent(searchTerm)}` : '';
+                const res = await fetch(`${API}/api/company/public${params}`);
+                const data = await res.json();
+
+                if (data.success && data.companies?.length > 0) {
+                    setCompanies(data.companies);
+                    setUsingApi(true);
+                } else {
+                    setUsingApi(false);
+                    setCompanies([]);
+                }
+            } catch (err) {
+                console.error('Failed to fetch companies:', err);
+                setUsingApi(false);
+                setCompanies([]);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        const debounce = setTimeout(fetchCompanies, 300);
+        return () => clearTimeout(debounce);
+    }, [searchTerm]);
+
+    // Use static data as fallback
+    const displayCompanies = usingApi ? companies : staticCompanies.filter(c =>
+        !searchTerm || c.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        c.industry?.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
     return (
-        <div className="min-h-screen bg-premium-black font-sans text-white">
+        <div className="min-h-screen font-sans" style={{ backgroundColor: 'var(--bg-primary)', color: 'var(--text-primary)' }}>
             <NavBar />
-
-            {/* Header / Hero for Companies (Crystal) */}
-            <div className="relative py-24 px-6 text-center overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-b from-indigo-900/20 to-transparent pointer-events-none" />
-                <div className="max-w-7xl mx-auto relative z-10">
-                    <h1 className="text-5xl md:text-6xl font-bold mb-6 tracking-tight text-white">Top Companies</h1>
-                    <p className="text-xl text-gray-300 max-w-2xl mx-auto font-light leading-relaxed mb-10">
-                        Explore thousands of companies hiring now. Find the perfect workplace that matches your ambition and culture.
-                    </p>
-
-                    {/* Search Bar */}
-                    <div className="max-w-2xl mx-auto bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-2 flex items-center shadow-2xl">
-                        <Search className="text-gray-400 ml-4" size={24} />
+            <div className="max-w-7xl mx-auto px-6 py-12">
+                <div className="flex flex-col md:flex-row items-center justify-between mb-10">
+                    <div>
+                        <h1 className="text-4xl font-bold text-white font-serif">Explore Companies</h1>
+                        <p className="text-gray-400 mt-2">Discover top companies hiring right now</p>
+                    </div>
+                    <div className="relative mt-4 md:mt-0">
+                        <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
                         <input
                             type="text"
-                            placeholder="Search companies by name or industry..."
-                            className="bg-transparent border-none outline-none text-white px-4 py-3 flex-1 placeholder-gray-500 text-lg"
+                            placeholder="Search companies..."
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            className="pl-9 pr-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-indigo-500 w-72"
                         />
-                        <button className="bg-white text-black px-8 py-3 rounded-xl font-bold hover:bg-gray-200 transition-colors">
-                            Search
-                        </button>
                     </div>
                 </div>
-            </div>
 
-            {/* Companies Grid */}
-            <div className="max-w-7xl mx-auto px-6 pb-20">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-                    {companies.map((company) => (
-                        <div key={company.id} className="bg-white/5 backdrop-blur-md rounded-3xl p-6 shadow-lg border border-white/10 group cursor-pointer relative overflow-hidden hover:-translate-y-2 transition-all duration-300 hover:shadow-2xl hover:bg-white/10">
-                            {/* Card Top Accent */}
-                            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-indigo-500 to-purple-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></div>
+                {!usingApi && !loading && (
+                    <div className="mb-4 text-xs text-yellow-400/60 bg-yellow-500/5 border border-yellow-500/10 rounded-lg px-3 py-2">
+                        Showing sample companies. Connect your backend for live data.
+                    </div>
+                )}
 
-                            <div className="flex items-start justify-between mb-6">
-                                <div className={`w-16 h-16 rounded-2xl flex items-center justify-center text-3xl font-bold text-white shadow-inner border border-white/10 bg-gradient-to-br from-gray-800 to-black overflow-hidden`}>
-                                    {company.logoUrl ? (
-                                        <img
-                                            src={company.logoUrl}
-                                            alt={company.name}
-                                            className="w-full h-full object-contain p-2"
-                                            onError={(e) => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'flex'; }}
-                                        />
-                                    ) : null}
-                                    <span style={{ display: company.logoUrl ? 'none' : 'flex' }} className="w-full h-full items-center justify-center">
-                                        {company.logo}
-                                    </span>
+                {loading ? (
+                    <div className="text-center py-20 text-gray-400">Loading companies...</div>
+                ) : displayCompanies.length === 0 ? (
+                    <div className="text-center py-20 text-gray-400">
+                        <p className="text-xl">No companies found matching your search.</p>
+                        <button onClick={() => setSearchTerm('')} className="text-indigo-400 mt-4 underline">Clear Search</button>
+                    </div>
+                ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {displayCompanies.map((company) => {
+                            const isApi = !!company._id;
+                            const companyId = company._id || company.id;
+                            const name = company.name;
+                            const location = company.location || 'Not specified';
+                            const description = company.description || company.industry || '';
+                            const logoUrl = isApi ? company.logo : company.logoUrl;
+                            const website = company.website || company.careerUrl || '#';
+
+                            return (
+                                <div key={companyId} className="bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-6 hover:border-indigo-500/50 hover:-translate-y-1 transition-all duration-300 group">
+                                    <div className="flex items-center gap-4 mb-4">
+                                        <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-gray-800 to-black border border-white/10 flex items-center justify-center overflow-hidden">
+                                            {logoUrl ? (
+                                                <img src={logoUrl} alt={name} className="w-full h-full object-contain p-2" onError={(e) => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'flex'; }} />
+                                            ) : null}
+                                            <span style={{ display: logoUrl ? 'none' : 'flex' }} className="w-full h-full items-center justify-center text-white font-bold text-xl">{name[0]}</span>
+                                        </div>
+                                        <div>
+                                            <h3 className="text-lg font-bold text-white group-hover:text-indigo-400 transition-colors">{name}</h3>
+                                            <p className="text-sm text-gray-400 flex items-center gap-1"><MapPin size={12} /> {location}</p>
+                                        </div>
+                                    </div>
+                                    {description && <p className="text-xs text-gray-500 mb-4 line-clamp-2">{description}</p>}
+                                    <a href={website} target="_blank" rel="noopener noreferrer" className="inline-block bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-sm font-bold px-4 py-2 rounded-lg hover:opacity-90 transition-opacity">
+                                        View Details
+                                    </a>
                                 </div>
-                                <span className="bg-white/10 border border-white/10 text-white text-xs font-bold px-3 py-1 rounded-full backdrop-blur-sm">
-                                    {company.jobsOpen} Jobs
-                                </span>
-                            </div>
-
-                            <h3 className="text-xl font-bold text-white mb-2 group-hover:text-indigo-300 transition-colors">{company.name}</h3>
-                            <p className="text-gray-400 text-sm mb-6 font-medium tracking-wide uppercase">{company.industry}</p>
-
-                            <div className="flex items-center text-gray-500 text-sm gap-2 mt-auto border-t border-white/5 pt-4">
-                                <MapPin size={16} className="text-indigo-400" />
-                                <span>{company.location}</span>
-                            </div>
-
-                            <a href={company.careerUrl} target="_blank" rel="noopener noreferrer" className="block w-full mt-6 py-3 border border-white/10 text-white font-bold rounded-xl hover:bg-white hover:text-black transition-all duration-300 text-sm shadow-lg text-center">
-                                View Details
-                            </a>
-                        </div>
-                    ))}
-                </div>
+                            );
+                        })}
+                    </div>
+                )}
             </div>
-
             <Footer />
         </div>
     );

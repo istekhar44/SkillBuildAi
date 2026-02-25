@@ -86,3 +86,22 @@ export const updateCompany = async (req, res) => {
     console.error(error);
   }
 };
+
+// Get all companies (public, no auth required)
+export const getAllCompaniesPublic = async (req, res) => {
+  try {
+    const { search = "" } = req.query;
+    const query = search
+      ? { name: { $regex: search, $options: "i" } }
+      : {};
+
+    const companies = await Company.find(query).sort({ createdAt: -1 });
+    return res.status(200).json({
+      companies,
+      success: true,
+    });
+  } catch (error) {
+    console.error("Public companies error:", error);
+    res.status(500).json({ message: "Error fetching companies", success: false });
+  }
+};

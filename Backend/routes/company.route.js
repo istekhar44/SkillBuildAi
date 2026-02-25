@@ -6,6 +6,7 @@ import {
   getCompanyById,
   registerCompany,
   updateCompany,
+  getAllCompaniesPublic,
 } from "../controllers/company.controller.js";
 import { singleUpload } from "../middleware/multer.js";
 
@@ -15,5 +16,6 @@ router.route("/register").post(authenticateToken, registerCompany);
 router.route("/get").get(authenticateToken, getAllCompanies);
 router.route("/get/:id").get(authenticateToken, getCompanyById);
 router.route("/update/:id").put(authenticateToken, singleUpload, updateCompany);
+router.route("/public").get(getAllCompaniesPublic);
 
 export default router;

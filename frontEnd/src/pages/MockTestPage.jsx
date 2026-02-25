@@ -46,7 +46,7 @@ const MockTestPage = () => {
 
     if (!testData) {
         return (
-            <div className="min-h-screen bg-[#050505] flex items-center justify-center text-white">
+            <div className="min-h-screen theme-bg flex items-center justify-center text-white">
                 <div className="text-center">
                     <AlertTriangle size={48} className="mx-auto mb-4 text-yellow-400" />
                     <h2 className="text-2xl font-bold mb-2">Test Not Found</h2>
@@ -92,7 +92,7 @@ const MockTestPage = () => {
     // ─── RESULTS SCREEN ───
     if (submitted && results) {
         return (
-            <div className="min-h-screen bg-[#050505] text-white">
+            <div className="min-h-screen theme-bg text-white">
                 {/* Results Header */}
                 <div className="relative overflow-hidden">
                     <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-indigo-600/15 rounded-full blur-[120px] pointer-events-none"></div>
@@ -218,13 +218,13 @@ const MockTestPage = () => {
     const answeredCount = Object.keys(answers).length;
 
     return (
-        <div className="min-h-screen bg-[#050505] text-white flex flex-col">
+        <div className="min-h-screen theme-bg text-white flex flex-col">
             {/* Ambient Glows */}
             <div className="fixed top-0 left-1/4 w-[500px] h-[500px] bg-indigo-600/10 rounded-full blur-[120px] pointer-events-none"></div>
             <div className="fixed bottom-0 right-1/4 w-[400px] h-[400px] bg-purple-600/8 rounded-full blur-[120px] pointer-events-none"></div>
 
             {/* Top Bar */}
-            <header className="sticky top-0 z-30 bg-[#050505]/80 backdrop-blur-xl border-b border-white/10">
+            <header className="sticky top-0 z-30 backdrop-blur-xl border-b border-white/10" style={{ backgroundColor: 'var(--bg-nav)' }}>
                 <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
                     <div className="flex items-center gap-4">
                         <div className={`w-10 h-10 ${testData.color} text-white flex items-center justify-center font-bold rounded-lg text-sm`}>

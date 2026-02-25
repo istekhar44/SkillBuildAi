@@ -36,7 +36,7 @@ const CodingChallengePage = () => {
 
     if (!problem) {
         return (
-            <div className="min-h-screen bg-[#050505] flex items-center justify-center text-white">
+            <div className="min-h-screen theme-bg flex items-center justify-center text-white">
                 <div className="text-center">
                     <BookOpen size={48} className="mx-auto mb-4 text-gray-500" />
                     <h2 className="text-2xl font-bold mb-2">Problem Not Available</h2>
@@ -150,8 +150,8 @@ const CodingChallengePage = () => {
                     <button
                         onClick={markComplete}
                         className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${completed
-                                ? "bg-green-500/20 text-green-400 border border-green-500/30"
-                                : "bg-white/5 border border-white/10 text-gray-400 hover:bg-white/10"
+                            ? "bg-green-500/20 text-green-400 border border-green-500/30"
+                            : "bg-white/5 border border-white/10 text-gray-400 hover:bg-white/10"
                             }`}
                     >
                         <CheckCircle2 size={14} /> {completed ? "Completed" : "Mark Complete"}
@@ -233,8 +233,8 @@ const CodingChallengePage = () => {
                                     <div className="space-y-3">
                                         {/* Summary */}
                                         <div className={`p-4 rounded-xl border ${passedCount === totalTests
-                                                ? "bg-green-500/10 border-green-500/30"
-                                                : "bg-red-500/10 border-red-500/30"
+                                            ? "bg-green-500/10 border-green-500/30"
+                                            : "bg-red-500/10 border-red-500/30"
                                             }`}>
                                             <div className="flex items-center gap-2">
                                                 {passedCount === totalTests

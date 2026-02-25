@@ -11,10 +11,10 @@ const coursesData = [
         image: 'https://i.pinimg.com/1200x/52/19/d9/5219d9b3f4606ed553479e91b2b9b8d2.jpg',
         color: 'text-indigo-300 bg-indigo-500/20',
         playlistTitle: 'MERN Stack Full Course | Hindi',
-        channel: 'Thapa Technical',
+        channel: 'Apna College',
         videos: [
-            { id: 'k7ELO356Npo', title: 'MERN Stack Tutorial #1 - What is MERN?', duration: '10:25' },
-            { id: 'ngc9greGnVs', title: 'MERN Stack Tutorial #2 - Express Setup', duration: '15:42' },
+            { id: 'HcOc7P5BMi4', title: 'MERN Stack Tutorial #1 - What is MERN?', duration: '2:10:25' },
+            { id: 'ESnrn1kAD4E', title: 'MERN Stack Tutorial #2 - Express Setup', duration: '7:15:42' },
             { id: 'ChVE-JbtYbM', title: 'MERN Stack Tutorial #3 - MongoDB Connection', duration: '12:30' },
             { id: 'f2EqECiTBL8', title: 'MERN Stack Tutorial #4 - React Frontend Setup', duration: '18:15' },
             { id: '0riHps91AzE', title: 'MERN Stack Tutorial #5 - REST API Design', duration: '20:08' },
@@ -57,7 +57,7 @@ const coursesData = [
         playlistTitle: 'UI/UX Design Tutorial | Hindi',
         channel: 'DesignBoat School',
         videos: [
-            { id: 'c9Wg6Cb_YlU', title: 'UI/UX #1 - What is UI/UX Design?', duration: '11:30' },
+            { id: '68w2VwalD5w', title: 'UI/UX #1 - What is UI/UX Design?', duration: '11:30' },
             { id: '68w2VwalD5w', title: 'UI/UX #2 - Design Thinking Process', duration: '16:45' },
             { id: 'wIuVvCuiJhU', title: 'UI/UX #3 - Wireframing Basics', duration: '13:20' },
             { id: 'FTFaQWZBqQ8', title: 'UI/UX #4 - Color Theory for UI', duration: '15:55' },
@@ -79,7 +79,7 @@ const coursesData = [
         playlistTitle: 'Machine Learning Full Course | Hindi',
         channel: 'CodeWithHarry',
         videos: [
-            { id: '7uwa9aPbBRU', title: 'ML #1 - What is Machine Learning?', duration: '18:30' },
+            { id: '7uwa9aPbBRU', title: 'ML #1 - What ', duration: '18:30' },
             { id: 'gmvvaobm7eQ', title: 'ML #2 - Types of ML Algorithms', duration: '22:15' },
             { id: 'jGwO_UgTS7I', title: 'ML #3 - Linear Regression', duration: '25:40' },
             { id: 'PPcgtx0sI2E', title: 'ML #4 - Logistic Regression', duration: '20:55' },
@@ -108,7 +108,7 @@ const LearningPage = () => {
     };
 
     return (
-        <div className="min-h-screen bg-premium-black font-sans text-white">
+        <div className="min-h-screen font-sans" style={{ backgroundColor: 'var(--bg-primary)', color: 'var(--text-primary)' }}>
             <NavBar />
 
             <div className="relative py-20 px-6 overflow-hidden">

@@ -17,7 +17,7 @@ import CodingChallengePage from './pages/CodingChallengePage';
 const App = () => {
   return (
     <Routes>
-      <Route path="/" element={<HomePage />} />
+      <Route path="/" element={<HomePage />} />   
       <Route path="/browse" element={<BrowsePage />} />
       <Route path="/companies" element={<CompaniesPage />} />
       <Route path="/dashboard" element={<DashboardPage />} />

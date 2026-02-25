@@ -54,6 +54,39 @@ const userSchema = new mongoose.Schema(  //What is the schema ?
         type: String, // URL to profile photo file
         default: "",
       },
+      location: {
+        type: String,
+        default: "",
+      },
+      education: [
+        {
+          degree: { type: String, required: true },
+          institution: { type: String, required: true },
+          year: { type: String },
+          gpa: { type: String },
+        },
+      ],
+      projects: [
+        {
+          name: { type: String, required: true },
+          tech: { type: String },
+          description: { type: String },
+          link: { type: String },
+        },
+      ],
+      savedJobs: [
+        {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "Job",
+        },
+      ],
+    },
+    notificationPrefs: {
+      emailNotifs: { type: Boolean, default: true },
+      appUpdates: { type: Boolean, default: true },
+      jobRecommendations: { type: Boolean, default: false },
+      interviewReminders: { type: Boolean, default: true },
+      marketingEmails: { type: Boolean, default: false },
     },
   },
   { timestamps: true }

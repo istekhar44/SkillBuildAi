@@ -52,7 +52,7 @@ export const postJob = async (req, res) => {
     }
 
     // Parse requirements if it's a string
-    const parsedRequirements = typeof requirements === "string" 
+    const parsedRequirements = typeof requirements === "string"
       ? requirements.split(",").map((r) => r.trim()).filter((r) => r.length > 0)
       : requirements;
 
@@ -101,19 +101,37 @@ export const postJob = async (req, res) => {
 // Get all jobs with search and filtering
 export const getAllJobs = async (req, res) => {
   try {
-    const { keyword = "", page = 1, limit = 10 } = req.query;
+    const { keyword = "", page = 1, limit = 10, category, location, jobType } = req.query;
 
     // Validate pagination
     const pageNum = Math.max(1, parseInt(page) || 1);
     const limitNum = Math.min(100, Math.max(1, parseInt(limit) || 10));
     const skip = (pageNum - 1) * limitNum;
 
-    const query = {
-      $or: [
+    const query = {};
+
+    // Keyword search
+    if (keyword) {
+      query.$or = [
         { title: { $regex: keyword, $options: "i" } },
         { description: { $regex: keyword, $options: "i" } },
-      ],
-    };
+      ];
+    }
+
+    // Category filter
+    if (category) {
+      query.category = category;
+    }
+
+    // Location filter
+    if (location) {
+      query.location = { $regex: location, $options: "i" };
+    }
+
+    // Job type filter
+    if (jobType) {
+      query.jobType = { $regex: jobType, $options: "i" };
+    }
 
     const jobs = await Job.find(query)
       .populate("company")

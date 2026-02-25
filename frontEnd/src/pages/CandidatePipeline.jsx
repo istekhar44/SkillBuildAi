@@ -47,7 +47,7 @@ const CandidatePipeline = () => {
     };
 
     return (
-        <div className="min-h-screen bg-premium-black font-sans text-white">
+        <div className="min-h-screen theme-bg font-sans text-white">
             <NavBar />
 
             <div className="max-w-[1600px] mx-auto px-6 py-8">
@@ -150,7 +150,7 @@ const CandidatePipeline = () => {
 
             <style>{`.custom-scrollbar::-webkit-scrollbar { width: 4px; } .custom-scrollbar::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }`}</style>
             {/* Short footer for this full-height View */}
-            <div className="border-t border-white/5 p-4 text-center text-xs text-gray-600 bg-premium-black">
+            <div className="border-t border-white/5 p-4 text-center text-xs text-gray-600 theme-bg">
                 &copy; SkillBridge AI Recruiter Suite
             </div>
         </div>

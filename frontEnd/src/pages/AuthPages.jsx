@@ -42,7 +42,7 @@ export const LoginPage = () => {
     };
 
     return (
-        <div className="min-h-screen bg-premium-black font-sans text-white">
+        <div className="min-h-screen font-sans" style={{ backgroundColor: 'var(--bg-primary)', color: 'var(--text-primary)' }}>
             <NavBar />
             <div className="max-w-md mx-auto px-6 py-12">
                 <div className="bg-white/5 backdrop-blur-md border border-white/10 p-8 rounded-2xl shadow-2xl">
@@ -144,7 +144,7 @@ export const RegisterPage = () => {
     };
 
     return (
-        <div className="min-h-screen bg-premium-black font-sans text-white">
+        <div className="min-h-screen font-sans" style={{ backgroundColor: 'var(--bg-primary)', color: 'var(--text-primary)' }}>
             <NavBar />
             <div className="max-w-md mx-auto px-6 py-12">
                 <div className="bg-white/5 backdrop-blur-md border border-white/10 p-8 rounded-2xl shadow-2xl">
@@ -213,7 +213,7 @@ export const RegisterPage = () => {
 };
 
 export const AboutPage = () => (
-    <div className="min-h-screen bg-premium-black font-sans text-white">
+    <div className="min-h-screen font-sans" style={{ backgroundColor: 'var(--bg-primary)', color: 'var(--text-primary)' }}>
         <NavBar />
         <div className="max-w-7xl mx-auto px-6 py-12">
             <div className="text-center mb-12">

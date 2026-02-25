@@ -29,21 +29,33 @@ export const API_ENDPOINTS = {
     LOGIN: '/api/user/login',
     LOGOUT: '/api/user/logout',
     UPDATE_PROFILE: '/api/user/profile/update',
+    GET_PROFILE: '/api/user/profile',
+    CHANGE_PASSWORD: '/api/user/change-password',
+    NOTIFICATIONS: '/api/user/notifications',
+    EDUCATION: '/api/user/education',
+    PROJECTS: '/api/user/projects',
+    SAVED_JOBS: '/api/user/saved-jobs',
   },
   COMPANY: {
     GET_ALL: '/api/company/get',
     CREATE: '/api/company/register',
     UPDATE: '/api/company/update',
+    PUBLIC: '/api/company/public',
   },
   JOB: {
     GET_ALL: '/api/job/get',
     CREATE: '/api/job/post',
     UPDATE: '/api/job/update',
+    ADMIN: '/api/job/getadminjobs',
   },
   APPLICATION: {
     GET_ALL: '/api/application/get',
     CREATE: '/api/application/apply',
     UPDATE: '/api/application/status',
+    APPLICANTS: '/api/application',
+  },
+  DASHBOARD: {
+    STATS: '/api/dashboard/stats',
   },
 };
 

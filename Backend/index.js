@@ -11,6 +11,7 @@ import companyRoute from "./routes/company.route.js";
 import jobRoute from "./routes/job.route.js";
 import applicationRoute from "./routes/application.route.js";
 import newsletterRoute from "./routes/newsletter.route.js";
+import dashboardRoute from "./routes/dashboard.route.js";
 
 dotenv.config();
 
@@ -64,6 +65,7 @@ app.use("/api/company", companyRoute);
 app.use("/api/job", jobRoute);
 app.use("/api/application", applicationRoute);
 app.use("/api/newsletter", newsletterRoute);
+app.use("/api/dashboard", dashboardRoute);
 
 // Error Handling Middleware
 app.use((err, req, res, next) => {

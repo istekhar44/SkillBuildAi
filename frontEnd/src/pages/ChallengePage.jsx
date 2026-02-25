@@ -30,7 +30,7 @@ const ChallengePage = () => {
     };
 
     return (
-        <div className="min-h-screen bg-premium-black font-sans text-white">
+        <div className="min-h-screen font-sans" style={{ backgroundColor: 'var(--bg-primary)', color: 'var(--text-primary)' }}>
             <NavBar />
 
             <div className="relative py-16 px-6 overflow-hidden">
