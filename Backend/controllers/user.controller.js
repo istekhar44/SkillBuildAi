@@ -3,6 +3,9 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import getDataUri from "../utils/datauri.js";
 import cloudinary from "../utils/cloud.js";
+import { OAuth2Client } from "google-auth-library";
+
+const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 // Utility function to validate email
 const isValidEmail = (email) => {
@@ -25,10 +28,10 @@ export const register = async (req, res) => {
   try {
     const { fullname, email, phoneNumber, password, adharcard, pancard, role } = req.body;
 
-    // Validate required fields
-    if (!fullname?.trim() || !email?.trim() || !phoneNumber?.trim() || !password || !role || !pancard?.trim() || !adharcard?.trim()) {
+    // Validate required fields (only fullname, email, password, role are required)
+    if (!fullname?.trim() || !email?.trim() || !password || !role) {
       return res.status(400).json({
-        message: "Missing or invalid required fields",
+        message: "Full name, email, password and role are required",
         success: false,
       });
     }
@@ -41,8 +44,8 @@ export const register = async (req, res) => {
       });
     }
 
-    // Validate phone number
-    if (!isValidPhone(phoneNumber)) {
+    // Validate phone number (only if provided)
+    if (phoneNumber && !isValidPhone(phoneNumber)) {
       return res.status(400).json({
         message: "Invalid phone number. Must be 10 digits",
         success: false,
@@ -74,48 +77,47 @@ export const register = async (req, res) => {
       });
     }
 
-    // Check duplicate Aadhar
-    const existingAdharcard = await User.findOne({ adharcard });
-    if (existingAdharcard) {
-      return res.status(409).json({
-        message: "Aadhar number already exists",
-        success: false,
-      });
+    // Check duplicate Aadhar (only if provided)
+    if (adharcard?.trim()) {
+      const existingAdharcard = await User.findOne({ adharcard });
+      if (existingAdharcard) {
+        return res.status(409).json({
+          message: "Aadhar number already exists",
+          success: false,
+        });
+      }
     }
 
-    // Check duplicate PAN
-    const existingPancard = await User.findOne({ pancard });
-    if (existingPancard) {
-      return res.status(409).json({
-        message: "PAN number already exists",
-        success: false,
-      });
+    // Check duplicate PAN (only if provided)
+    if (pancard?.trim()) {
+      const existingPancard = await User.findOne({ pancard });
+      if (existingPancard) {
+        return res.status(409).json({
+          message: "PAN number already exists",
+          success: false,
+        });
+      }
     }
 
-    // Validate file upload
+    // Handle optional file upload
+    let profilePhotoUrl = "";
     const file = req.file;
-    if (!file) {
-      return res.status(400).json({
-        message: "Profile image is required",
-        success: false,
-      });
-    }
+    if (file) {
+      const allowedMimes = ["image/jpeg", "image/png", "image/gif"];
+      if (!allowedMimes.includes(file.mimetype)) {
+        return res.status(400).json({
+          message: "Only JPEG, PNG, and GIF images are allowed",
+          success: false,
+        });
+      }
 
-    // Validate file type
-    const allowedMimes = ["image/jpeg", "image/png", "image/gif"];
-    if (!allowedMimes.includes(file.mimetype)) {
-      return res.status(400).json({
-        message: "Only JPEG, PNG, and GIF images are allowed",
-        success: false,
+      const fileUri = getDataUri(file);
+      const cloudResponse = await cloudinary.uploader.upload(fileUri.content, {
+        resource_type: "auto",
+        folder: "skillbuild/profiles",
       });
+      profilePhotoUrl = cloudResponse.secure_url;
     }
-
-    // Upload to Cloudinary
-    const fileUri = getDataUri(file);
-    const cloudResponse = await cloudinary.uploader.upload(fileUri.content, {
-      resource_type: "auto",
-      folder: "skillbuild/profiles",
-    });
 
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -124,13 +126,14 @@ export const register = async (req, res) => {
     const newUser = new User({
       fullname: fullname.trim(),
       email: email.toLowerCase(),
-      phoneNumber,
-      adharcard,
-      pancard,
+      phoneNumber: phoneNumber || undefined,
+      adharcard: adharcard?.trim() || undefined,
+      pancard: pancard?.trim() || undefined,
       password: hashedPassword,
       role,
+      authProvider: "local",
       profile: {
-        profilePhoto: cloudResponse.secure_url,
+        profilePhoto: profilePhotoUrl,
       },
     });
 
@@ -142,7 +145,7 @@ export const register = async (req, res) => {
     });
   } catch (error) {
     console.error("Register error:", error);
-    if (error.name === "MongoError" && error.code === 11000) {
+    if (error.code === 11000) {
       return res.status(409).json({
         message: "Duplicate field error",
         success: false,
@@ -180,6 +183,14 @@ export const login = async (req, res) => {
     if (!user) {
       return res.status(401).json({
         message: "Incorrect email or password",
+        success: false,
+      });
+    }
+
+    // Check if user registered via Google only (no password set)
+    if (!user.password) {
+      return res.status(401).json({
+        message: "This account uses Google Sign-In. Please login with Google.",
         success: false,
       });
     }
@@ -685,3 +696,107 @@ export const getSavedJobs = async (req, res) => {
   }
 };
 
+// Google OAuth Login
+export const googleLogin = async (req, res) => {
+  try {
+    const { credential, role } = req.body;
+
+    if (!credential) {
+      return res.status(400).json({
+        message: "Google credential is required",
+        success: false,
+      });
+    }
+
+    // Verify the Google ID token
+    const ticket = await googleClient.verifyIdToken({
+      idToken: credential,
+      audience: process.env.GOOGLE_CLIENT_ID,
+    });
+
+    const payload = ticket.getPayload();
+    const { sub: googleId, email, name, picture } = payload;
+
+    if (!email) {
+      return res.status(400).json({
+        message: "Could not get email from Google account",
+        success: false,
+      });
+    }
+
+    // Check if user already exists (by googleId or email)
+    let user = await User.findOne({
+      $or: [{ googleId }, { email: email.toLowerCase() }],
+    });
+
+    if (user) {
+      // If user exists but was a local account, link Google
+      if (!user.googleId) {
+        user.googleId = googleId;
+        user.authProvider = "google";
+        if (picture && !user.profile.profilePhoto) {
+          user.profile.profilePhoto = picture;
+        }
+        await user.save();
+      }
+    } else {
+      // Create new user with Google data
+      const selectedRole = role || "student";
+      if (!["student", "recruiter"].includes(selectedRole)) {
+        return res.status(400).json({
+          message: "Invalid role",
+          success: false,
+        });
+      }
+
+      user = new User({
+        fullname: name || "Google User",
+        email: email.toLowerCase(),
+        googleId,
+        authProvider: "google",
+        role: selectedRole,
+        profile: {
+          profilePhoto: picture || "",
+        },
+      });
+
+      await user.save();
+    }
+
+    // Generate JWT token
+    const tokenData = { userId: user._id };
+    const token = jwt.sign(tokenData, process.env.JWT_SECRET, {
+      expiresIn: "1d",
+    });
+
+    // Sanitize user data
+    const sanitizedUser = {
+      _id: user._id,
+      fullname: user.fullname,
+      email: user.email,
+      phoneNumber: user.phoneNumber,
+      role: user.role,
+      profile: user.profile,
+    };
+
+    return res
+      .status(200)
+      .cookie("token", token, {
+        maxAge: 24 * 60 * 60 * 1000,
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: process.env.NODE_ENV === "production" ? "Lax" : "Strict",
+      })
+      .json({
+        message: `Welcome ${user.fullname}`,
+        user: sanitizedUser,
+        success: true,
+      });
+  } catch (error) {
+    console.error("Google login error:", error);
+    res.status(500).json({
+      message: "Error during Google login",
+      success: false,
+    });
+  }
+};

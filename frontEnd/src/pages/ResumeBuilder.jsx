@@ -203,7 +203,8 @@ const ResumeBuilder = () => {
                                             placeholder={field.charAt(0).toUpperCase() + field.slice(1)}
                                             value={resumeData.personal[field]}
                                             onChange={handlePersonalChange}
-                                            className={`w-full p-3 bg-black/40 border border-white/10 rounded-xl focus:ring-1 focus:ring-white/50 text-white placeholder-gray-600 outline-none transition-all ${field === 'portfolio' ? 'md:col-span-2' : ''}`}
+                                            className={`w-full p-3 border border-blue-200 rounded-xl focus:ring-1 focus:ring-blue-300 text-gray-800 placeholder-gray-400 outline-none transition-all ${field === 'portfolio' ? 'md:col-span-2' : ''}`}
+                                            style={{ backgroundColor: '#E7F5FE' }}
                                         />
                                     ))}
                                     <textarea
@@ -211,7 +212,8 @@ const ResumeBuilder = () => {
                                         placeholder="Professional Summary..."
                                         value={resumeData.personal.summary}
                                         onChange={handlePersonalChange}
-                                        className="md:col-span-2 w-full p-3 bg-black/40 border border-white/10 rounded-xl focus:ring-1 focus:ring-white/50 text-white placeholder-gray-600 outline-none h-24 resize-none transition-all"
+                                        className="md:col-span-2 w-full p-3 border border-blue-200 rounded-xl focus:ring-1 focus:ring-blue-300 text-gray-800 placeholder-gray-400 outline-none h-24 resize-none transition-all"
+                                        style={{ backgroundColor: '#E7F5FE' }}
                                     />
                                 </div>
                             </section>
@@ -225,7 +227,8 @@ const ResumeBuilder = () => {
                                     placeholder="React, Node.js, Python, Leadership..."
                                     value={resumeData.skills}
                                     onChange={handleSkillsChange}
-                                    className="w-full p-3 bg-black/40 border border-white/10 rounded-xl h-24 resize-none focus:ring-1 focus:ring-white/50 text-white placeholder-gray-600 outline-none"
+                                    className="w-full p-3 border border-blue-200 rounded-xl h-24 resize-none focus:ring-1 focus:ring-blue-300 text-gray-800 placeholder-gray-400 outline-none"
+                                    style={{ backgroundColor: '#E7F5FE' }}
                                 />
                             </section>
 
@@ -243,10 +246,10 @@ const ResumeBuilder = () => {
                                             <button onClick={() => removeListItem('experience', idx)} className="absolute top-2 right-2 text-gray-500 hover:text-red-400 p-1 opacity-0 group-hover:opacity-100 transition-opacity font-bold">×</button>
                                             <div className="grid grid-cols-2 gap-3 mb-3">
                                                 {['role', 'company', 'dates', 'location'].map(f => (
-                                                    <input key={f} placeholder={f.charAt(0).toUpperCase() + f.slice(1)} value={item[f] || ''} onChange={(e) => updateListItem('experience', idx, f, e.target.value)} className="w-full p-2 bg-black/40 border border-white/10 rounded-lg text-sm text-white focus:outline-none focus:border-white/30" />
+                                                    <input key={f} placeholder={f.charAt(0).toUpperCase() + f.slice(1)} value={item[f] || ''} onChange={(e) => updateListItem('experience', idx, f, e.target.value)} className="w-full p-2 border border-blue-200 rounded-lg text-sm text-gray-800 focus:outline-none focus:border-blue-300" style={{ backgroundColor: '#E7F5FE' }} />
                                                 ))}
                                             </div>
-                                            <textarea placeholder="Achievements..." value={item.description || ''} onChange={(e) => updateListItem('experience', idx, 'description', e.target.value)} className="w-full p-2 bg-black/40 border border-white/10 rounded-lg text-sm h-20 resize-none text-white focus:outline-none focus:border-white/30" />
+                                            <textarea placeholder="Achievements..." value={item.description || ''} onChange={(e) => updateListItem('experience', idx, 'description', e.target.value)} className="w-full p-2 border border-blue-200 rounded-lg text-sm h-20 resize-none text-gray-800 focus:outline-none focus:border-blue-300" style={{ backgroundColor: '#E7F5FE' }} />
                                         </div>
                                     ))}
                                 </div>
@@ -264,8 +267,8 @@ const ResumeBuilder = () => {
                                     {resumeData.projects.map((item, idx) => (
                                         <div key={idx} className="bg-white/5 p-4 rounded-xl relative group border border-white/5 hover:border-white/20 transition-all backdrop-blur-sm">
                                             <button onClick={() => removeListItem('projects', idx)} className="absolute top-2 right-2 text-gray-500 hover:text-red-400 p-1 opacity-0 group-hover:opacity-100 transition-opacity font-bold">×</button>
-                                            <input placeholder="Project Title" value={item.title || ''} onChange={(e) => updateListItem('projects', idx, 'title', e.target.value)} className="w-full p-2 bg-black/40 border border-white/10 rounded-lg text-sm mb-2 text-white focus:outline-none focus:border-white/30" />
-                                            <textarea placeholder="Description" value={item.description || ''} onChange={(e) => updateListItem('projects', idx, 'description', e.target.value)} className="w-full p-2 bg-black/40 border border-white/10 rounded-lg text-sm h-16 resize-none text-white focus:outline-none focus:border-white/30" />
+                                            <input placeholder="Project Title" value={item.title || ''} onChange={(e) => updateListItem('projects', idx, 'title', e.target.value)} className="w-full p-2 border border-blue-200 rounded-lg text-sm mb-2 text-gray-800 focus:outline-none focus:border-blue-300" style={{ backgroundColor: '#E7F5FE' }} />
+                                            <textarea placeholder="Description" value={item.description || ''} onChange={(e) => updateListItem('projects', idx, 'description', e.target.value)} className="w-full p-2 border border-blue-200 rounded-lg text-sm h-16 resize-none text-gray-800 focus:outline-none focus:border-blue-300" style={{ backgroundColor: '#E7F5FE' }} />
                                         </div>
                                     ))}
                                 </div>
@@ -285,7 +288,7 @@ const ResumeBuilder = () => {
                                             <button onClick={() => removeListItem('education', idx)} className="absolute top-2 right-2 text-gray-500 hover:text-red-400 p-1 opacity-0 group-hover:opacity-100 transition-opacity font-bold">×</button>
                                             <div className="grid grid-cols-2 gap-3">
                                                 {['school', 'degree', 'year'].map(f => (
-                                                    <input key={f} placeholder={f.charAt(0).toUpperCase() + f.slice(1)} value={item[f] || ''} onChange={(e) => updateListItem('education', idx, f, e.target.value)} className="w-full p-2 bg-black/40 border border-white/10 rounded-lg text-sm text-white focus:outline-none focus:border-white/30" />
+                                                    <input key={f} placeholder={f.charAt(0).toUpperCase() + f.slice(1)} value={item[f] || ''} onChange={(e) => updateListItem('education', idx, f, e.target.value)} className="w-full p-2 border border-blue-200 rounded-lg text-sm text-gray-800 focus:outline-none focus:border-blue-300" style={{ backgroundColor: '#E7F5FE' }} />
                                                 ))}
                                             </div>
                                         </div>

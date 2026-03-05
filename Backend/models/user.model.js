@@ -12,27 +12,33 @@ const userSchema = new mongoose.Schema(  //What is the schema ?
     },
     phoneNumber: {
       type: String,
-      required: true,
-      unique: true,
+      sparse: true,
     },
     password: {
       type: String,
-      required: true,
     },
     pancard: {
       type: String,
-      required: true,
-      unique: true,
+      sparse: true,
     },
     adharcard: {
       type: String,
-      required: true,
+      sparse: true,
+    },
+    googleId: {
+      type: String,
       unique: true,
+      sparse: true,
+    },
+    authProvider: {
+      type: String,
+      enum: ["local", "google"],
+      default: "local",
     },
     role: {
       type: String,
-      enum: ["Student", "Recruiter"],
-      default: "Student",
+      enum: ["student", "recruiter"],
+      default: "student",
       required: true,
     },
     profile: {

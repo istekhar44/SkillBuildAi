@@ -16,6 +16,9 @@ import dashboardRoute from "./routes/dashboard.route.js";
 dotenv.config();
 
 const app = express();
+
+// Connect to DB eagerly for Vercel serverless cold starts
+connectDB().catch(err => console.error("DB connection failed:", err.message));
 const PORT = process.env.PORT || 5011;
 const NODE_ENV = process.env.NODE_ENV || "development";
 
@@ -127,4 +130,10 @@ const startServer = async () => {
   }
 };
 
-startServer();
+// Export for Vercel serverless
+export default app;
+
+// Only listen when not running on Vercel
+if (!process.env.VERCEL) {
+  startServer();
+}

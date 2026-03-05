@@ -9,10 +9,7 @@ const RegistrationModal = ({ isOpen, onClose, context }) => {
         email: '',
         password: '',
         phoneNumber: '',
-        pancard: '',
-        adharcard: '',
         role: 'student',
-        file: null,
     });
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
@@ -22,10 +19,6 @@ const RegistrationModal = ({ isOpen, onClose, context }) => {
 
     const handleChange = (e) => {
         setForm({ ...form, [e.target.name]: e.target.value });
-    };
-
-    const handleFileChange = (e) => {
-        setForm({ ...form, file: e.target.files[0] });
     };
 
     const handleSubmit = async (e) => {
@@ -39,10 +32,7 @@ const RegistrationModal = ({ isOpen, onClose, context }) => {
             formData.append('email', form.email);
             formData.append('password', form.password);
             formData.append('phoneNumber', form.phoneNumber);
-            formData.append('pancard', form.pancard);
-            formData.append('adharcard', form.adharcard);
             formData.append('role', form.role);
-            if (form.file) formData.append('file', form.file);
 
             const res = await fetch(`${import.meta.env.VITE_API_URL}/user/register`, {
                 method: 'POST',
@@ -151,53 +141,17 @@ const RegistrationModal = ({ isOpen, onClose, context }) => {
                         />
                     </div>
 
-                    {/* Phone & Profile Photo */}
-                    <div className="grid grid-cols-2 gap-3">
-                        <div>
-                            <label className="block text-gray-300 font-medium mb-1 text-sm">Phone Number</label>
-                            <input
-                                type="text"
-                                name="phoneNumber"
-                                value={form.phoneNumber}
-                                onChange={handleChange}
-                                placeholder="+91..."
-                                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-indigo-500 transition-colors"
-                            />
-                        </div>
-                        <div>
-                            <label className="block text-gray-300 font-medium mb-1 text-sm">Profile Photo</label>
-                            <input
-                                type="file"
-                                onChange={handleFileChange}
-                                className="w-full text-sm text-gray-400 file:mr-2 file:py-2.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-white/10 file:text-white hover:file:bg-white/20 cursor-pointer"
-                            />
-                        </div>
-                    </div>
-
-                    {/* PAN & Aadhar */}
-                    <div className="grid grid-cols-2 gap-3">
-                        <div>
-                            <label className="block text-gray-300 font-medium mb-1 text-sm">PAN Card</label>
-                            <input
-                                type="text"
-                                name="pancard"
-                                value={form.pancard}
-                                onChange={handleChange}
-                                placeholder="ABCDE1234F"
-                                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-indigo-500 transition-colors"
-                            />
-                        </div>
-                        <div>
-                            <label className="block text-gray-300 font-medium mb-1 text-sm">Aadhar Card</label>
-                            <input
-                                type="text"
-                                name="adharcard"
-                                value={form.adharcard}
-                                onChange={handleChange}
-                                placeholder="1234 5678 9012"
-                                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-indigo-500 transition-colors"
-                            />
-                        </div>
+                    {/* Phone Number */}
+                    <div>
+                        <label className="block text-gray-300 font-medium mb-1 text-sm">Phone Number</label>
+                        <input
+                            type="text"
+                            name="phoneNumber"
+                            value={form.phoneNumber}
+                            onChange={handleChange}
+                            placeholder="+91 XXXXX XXXXX"
+                            className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-indigo-500 transition-colors"
+                        />
                     </div>
 
                     {/* Role */}
