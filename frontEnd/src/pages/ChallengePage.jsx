@@ -2,12 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import NavBar from '../components/NavBar';
 import Footer from '../components/Footer';
+import ApiPracticeModal from '../components/ApiPracticeModal';
 import { Trophy, Flame, Calendar, CheckCircle } from 'lucide-react';
 
 const ChallengePage = () => {
     // State for tracking progress
     const [progress, setProgress] = useState(0);
     const [completedDays, setCompletedDays] = useState([]);
+    const [showPractice, setShowPractice] = useState(false);
     const navigate = useNavigate();
 
     // Load progress from local storage
@@ -130,7 +132,10 @@ const ChallengePage = () => {
                             </div>
                         </div>
 
-                        <button className="w-full bg-white text-black py-4 rounded-xl font-bold hover:bg-gray-200 transition-colors shadow-lg shadow-white/10">
+                        <button
+                            onClick={() => setShowPractice(true)}
+                            className="w-full bg-white text-black py-4 rounded-xl font-bold hover:bg-gray-200 transition-colors shadow-lg shadow-white/10"
+                        >
                             Start Learning
                         </button>
 
@@ -139,6 +144,10 @@ const ChallengePage = () => {
                 </div>
 
             </div>
+
+            {/* API Practice Modal */}
+            <ApiPracticeModal isOpen={showPractice} onClose={() => setShowPractice(false)} />
+
             <Footer />
         </div>
     );

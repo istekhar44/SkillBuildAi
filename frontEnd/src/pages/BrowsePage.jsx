@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import NavBar from '../components/NavBar';
 import Footer from '../components/Footer';
+import JobApplyModal from '../components/JobApplyModal';
 import { jobListings as staticJobs, categories, locations } from '../data/jobs';
 import { MapPin, Briefcase, Clock, Search, SlidersHorizontal } from 'lucide-react';
 
@@ -15,6 +16,7 @@ const BrowsePage = () => {
     const [jobs, setJobs] = useState([]);
     const [loading, setLoading] = useState(true);
     const [usingApi, setUsingApi] = useState(false);
+    const [selectedJob, setSelectedJob] = useState(null);
 
     useEffect(() => {
         if (location.state?.searchQuery) {
@@ -141,7 +143,7 @@ const BrowsePage = () => {
                                 const logo = isApiJob ? null : job.logo;
 
                                 return (
-                                    <div key={jobId} className="bg-white/5 backdrop-blur-md rounded-2xl p-6 border border-white/10 hover:border-indigo-500/50 hover:-translate-y-1 transition-all duration-300 group cursor-pointer">
+                                    <div key={jobId} onClick={() => setSelectedJob(job)} className="bg-white/5 backdrop-blur-md rounded-2xl p-6 border border-white/10 hover:border-indigo-500/50 hover:-translate-y-1 transition-all duration-300 group cursor-pointer">
                                         <div className="flex items-start justify-between mb-4">
                                             <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-gray-800 to-black border border-white/10 flex items-center justify-center overflow-hidden">
                                                 {logo ? (
@@ -171,6 +173,13 @@ const BrowsePage = () => {
                                             <span className="text-sm font-bold text-green-400">{salary}</span>
                                             <span className="text-xs text-gray-500">{experience}</span>
                                         </div>
+                                        <button
+                                            onClick={(e) => { e.stopPropagation(); setSelectedJob(job); }}
+                                            className="w-full mt-4 py-2.5 rounded-xl text-sm font-bold transition-all shadow-lg flex items-center justify-center gap-2 hover:brightness-110"
+                                            style={{ backgroundColor: 'var(--btn-apply-bg)', color: 'var(--btn-apply-text)', boxShadow: '0 4px 14px var(--btn-apply-shadow)' }}
+                                        >
+                                            Apply Now <span>→</span>
+                                        </button>
                                     </div>
                                 );
                             })}
@@ -185,6 +194,14 @@ const BrowsePage = () => {
                     </div>
                 </div>
             </div>
+
+            {/* Job Apply Modal */}
+            <JobApplyModal
+                isOpen={!!selectedJob}
+                onClose={() => setSelectedJob(null)}
+                job={selectedJob}
+            />
+
             <Footer />
         </div>
     );

@@ -254,10 +254,18 @@ export const login = async (req, res) => {
 
 export const logout = async (req, res) => {
   try {
-    return res.status(200).cookie("token", "", { maxAge: 0 }).json({
-      message: "Logged out successfully",
-      success: true,
-    });
+    return res
+      .status(200)
+      .cookie("token", "", {
+        maxAge: 0,
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: process.env.NODE_ENV === "production" ? "Lax" : "Strict",
+      })
+      .json({
+        message: "Logged out successfully",
+        success: true,
+      });
   } catch (error) {
     console.error("Logout error:", error);
     res.status(500).json({
@@ -793,9 +801,9 @@ export const googleLogin = async (req, res) => {
         success: true,
       });
   } catch (error) {
-    console.error("Google login error:", error);
+    console.error("Google login error:", error.message, error.stack);
     res.status(500).json({
-      message: "Error during Google login",
+      message: error.message || "Error during Google login",
       success: false,
     });
   }

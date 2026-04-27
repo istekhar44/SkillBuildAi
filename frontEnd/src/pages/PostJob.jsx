@@ -4,6 +4,8 @@ import Footer from '../components/Footer';
 import { ArrowLeft, Check, Sparkles } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
+const API = import.meta.env.VITE_API_URL || 'http://localhost:5011';
+
 const PostJob = () => {
     const navigate = useNavigate();
     const [step, setStep] = useState(1);
@@ -28,7 +30,7 @@ const PostJob = () => {
         // Fetch user's companies
         const fetchCompanies = async () => {
             try {
-                const res = await fetch(`${import.meta.env.VITE_API_URL}/company/get`, {
+                const res = await fetch(`${API}/api/company/get`, {
                     credentials: 'include'
                 });
                 const data = await res.json();
@@ -54,7 +56,7 @@ const PostJob = () => {
         setError('');
 
         try {
-            const res = await fetch(`${import.meta.env.VITE_API_URL}/job/post`, {
+            const res = await fetch(`${API}/api/job/post`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 credentials: 'include',
@@ -117,7 +119,12 @@ const PostJob = () => {
                                 <div>
                                     <label className="block text-sm font-bold text-gray-300 mb-2">Company</label>
                                     <select name="companyId" value={formData.companyId} onChange={handleInputChange} className="w-full p-4 bg-black/40 border border-white/10 rounded-xl focus:ring-1 focus:ring-white/50 text-white outline-none transition-all">
+                                        <option value="">Select a Company</option>
                                         {companies.map(c => <option key={c._id} value={c._id}>{c.name}</option>)}
+                                        {companies.length > 0 && <option disabled>──────────────</option>}
+                                        {['Google', 'Microsoft', 'Amazon', 'Apple', 'Meta', 'Netflix', 'Tesla', 'Adobe', 'Spotify', 'Salesforce', 'IBM', 'Oracle', 'Intel', 'NVIDIA', 'Uber', 'Airbnb', 'Twitter / X', 'LinkedIn', 'Stripe', 'Shopify'].map(name => (
+                                            <option key={name} value={name}>{name}</option>
+                                        ))}
                                     </select>
                                 </div>
                                 <div>

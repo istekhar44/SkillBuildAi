@@ -106,13 +106,12 @@ const HomePage = () => {
                             <img
                                 src={istekharImg}
                                 alt="Professional"
-                                className="w-full h-auto object-cover rounded-3xl shadow-2xl rotate-y-6 hover:rotate-y-0 transition-transform duration-700 ease-out brightness-110 contrast-105"
-                                // style={{ border: '1px solid var(--border-color)' }}
+                                className="w-full h-auto object-cover rounded-3xl rotate-y-6 hover:rotate-y-0 transition-transform duration-700 ease-out brightness-110 contrast-105"
                             />
 
                             {/* Floating Stats Card 1 */}
                             <div className="absolute -left-8 top-20 backdrop-blur-xl p-4 rounded-2xl shadow-xl animate-float-slow"
-                                // style={{ backgroundColor: isDark ? 'rgba(0,0,0,0.6)' : 'rgba(255,255,255,0.85)', border: '1px solid var(--border-color)' }}
+                            // style={{ backgroundColor: isDark ? 'rgba(0,0,0,0.6)' : 'rgba(255,255,255,0.85)', border: '1px solid var(--border-color)' }}
                             >
                                 <div className="flex items-center gap-3">
                                     <div className="w-10 h-10 rounded-full bg-green-500/20 flex items-center justify-center text-green-400">

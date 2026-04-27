@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef } from 'react';
 import userAvatar from '../assets/user.jpeg';
 import NavBar from '../components/NavBar';
 import Footer from '../components/Footer';
-import CandidatePipelineSection from '../components/CandidatePipelineSection';
 import {
     LayoutDashboard, User, Briefcase, ClipboardList, Settings,
     MapPin, DollarSign, Clock, CheckCircle, XCircle, AlertCircle, Calendar,
@@ -124,9 +123,6 @@ const DashboardPage = () => {
                     {activeTab === 'tracking' && <ApplicationTrackingTab />}
                     {activeTab === 'settings' && <SettingsTab user={user} refreshUser={refreshUser} showPassword={showPassword} setShowPassword={setShowPassword} />}
                 </div>
-
-                {/* Application Pipeline */}
-                <CandidatePipelineSection title="Application Pipeline" />
             </div>
 
             <Footer />

@@ -114,9 +114,9 @@ const CodingChallengePage = () => {
     const totalTests = problem.testCases.length;
 
     return (
-        <div className="h-screen bg-[#0a0a0a] text-white flex flex-col overflow-hidden">
+        <div className="h-screen theme-bg theme-text flex flex-col overflow-hidden">
             {/* Top Bar */}
-            <header className="h-14 bg-[#111] border-b border-white/10 flex items-center justify-between px-4 shrink-0">
+            <header className="h-14 theme-bg border-b theme-border flex items-center justify-between px-4 shrink-0">
                 <div className="flex items-center gap-3">
                     <button onClick={() => navigate("/challenge")} className="p-2 hover:bg-white/10 rounded-lg transition-colors" title="Back to Roadmap">
                         <ArrowLeft size={18} />
@@ -164,7 +164,7 @@ const CodingChallengePage = () => {
                 {/* LEFT: Problem Description */}
                 <div className="lg:w-[45%] border-r border-white/10 flex flex-col overflow-hidden">
                     {/* Tabs */}
-                    <div className="flex border-b border-white/10 bg-[#111] shrink-0">
+                    <div className="flex border-b theme-border theme-bg shrink-0">
                         <button
                             onClick={() => setActiveTab("description")}
                             className={`px-5 py-3 text-sm font-medium transition-colors relative ${activeTab === "description" ? "text-white" : "text-gray-500 hover:text-gray-300"
@@ -290,7 +290,7 @@ const CodingChallengePage = () => {
                 {/* RIGHT: Code Editor */}
                 <div className="lg:w-[55%] flex flex-col overflow-hidden">
                     {/* Editor Header */}
-                    <div className="flex items-center justify-between px-4 py-2 bg-[#111] border-b border-white/10 shrink-0">
+                    <div className="flex items-center justify-between px-4 py-2 theme-bg border-b theme-border shrink-0">
                         <div className="flex items-center gap-2">
                             <span className="text-xs font-bold text-gray-400 bg-white/5 border border-white/10 px-2.5 py-1 rounded">JavaScript</span>
                         </div>
@@ -307,7 +307,7 @@ const CodingChallengePage = () => {
                             value={code}
                             onChange={(e) => setCode(e.target.value)}
                             spellCheck={false}
-                            className="w-full h-full bg-[#1a1a2e] text-gray-100 font-mono text-sm p-5 resize-none outline-none leading-relaxed border-none"
+                            className="w-full h-full theme-bg-card theme-text font-mono text-sm p-5 resize-none outline-none leading-relaxed border-none"
                             style={{
                                 tabSize: 2,
                                 fontFamily: "'Fira Code', 'Cascadia Code', 'JetBrains Mono', 'Consolas', monospace",
@@ -316,7 +316,7 @@ const CodingChallengePage = () => {
                     </div>
 
                     {/* Run Button Bar */}
-                    <div className="flex items-center justify-between px-4 py-3 bg-[#111] border-t border-white/10 shrink-0">
+                    <div className="flex items-center justify-between px-4 py-3 theme-bg border-t theme-border shrink-0">
                         <div className="text-xs text-gray-500">
                             {results && (
                                 <span className="flex items-center gap-1">

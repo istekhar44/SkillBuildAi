@@ -32,6 +32,10 @@
 
     --gradient-fade-left: linear-gradient(to right, #f4f6fb, transparent);
     --gradient-fade-right: linear-gradient(to left, #f4f6fb, transparent);
+
+    --btn-apply-bg: #3366FF;
+    --btn-apply-text: #ffffff;
+    --btn-apply-shadow: rgba(51, 102, 255, 0.35);
 }
 
 /* ─── Dark Theme ─── */
@@ -54,6 +58,10 @@
     --overlay: rgba(0, 0, 0, 0.6);
     --gradient-fade-left: linear-gradient(to right, #050505, transparent);
     --gradient-fade-right: linear-gradient(to left, #050505, transparent);
+
+    --btn-apply-bg: #ffffff;
+    --btn-apply-text: #000000;
+    --btn-apply-shadow: rgba(255, 255, 255, 0.15);
 }
 
 /* ─── Base Styles ─── */
@@ -153,6 +161,10 @@ body {
 
 /* --- Text colors --- */
 :root:not(.dark) .text-white {
+    color: var(--text-primary) !important;
+}
+
+:root:not(.dark) .text-gray-100 {
     color: var(--text-primary) !important;
 }
 
@@ -350,6 +362,49 @@ body {
 /* --- Scrollbar coloring --- */
 :root:not(.dark) .custom-scrollbar::-webkit-scrollbar-thumb {
     background: #cbd5e1 !important;
+}
+
+/* --- Post Job modal & hardcoded dark backgrounds --- */
+:root:not(.dark) .bg-gray-900 {
+    background-color: var(--bg-card) !important;
+}
+
+:root:not(.dark) .bg-black\/40 {
+    background-color: var(--bg-input) !important;
+}
+
+:root:not(.dark) select.bg-black\/40,
+:root:not(.dark) input.bg-black\/40,
+:root:not(.dark) textarea.bg-black\/40 {
+    background-color: var(--bg-input) !important;
+    color: var(--text-primary) !important;
+}
+
+:root:not(.dark) select.bg-black\/40 option {
+    background-color: #ffffff;
+    color: var(--text-primary);
+}
+
+:root:not(.dark) .text-gray-300 {
+    color: var(--text-secondary) !important;
+}
+
+/* --- Modal overlay --- */
+:root:not(.dark) .bg-black\/20 {
+    background-color: var(--bg-secondary) !important;
+}
+
+/* --- Gradient avatar circles keep white text --- */
+:root:not(.dark) .bg-gradient-to-r.from-indigo-500.to-purple-600 .text-white,
+:root:not(.dark) .bg-gradient-to-br.from-indigo-500.to-purple-600 .text-white,
+:root:not(.dark) .bg-gradient-to-r.from-indigo-500.to-purple-600,
+:root:not(.dark) .bg-gradient-to-br.from-indigo-500.to-purple-600 {
+    color: #ffffff !important;
+}
+
+/* --- Focus ring override for inputs --- */
+:root:not(.dark) .focus\:ring-indigo-500\/50:focus {
+    --tw-ring-color: rgba(37, 99, 235, 0.3) !important;
 }
 
 /* --- Amber glow backgrounds (light) --- */

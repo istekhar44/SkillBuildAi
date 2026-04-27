@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 
 const AuthContext = createContext();
+const API = import.meta.env.VITE_API_URL || 'http://localhost:5011';
 
 export const useAuth = () => {
     return useContext(AuthContext);
@@ -27,11 +28,19 @@ export const AuthProvider = ({ children }) => {
         localStorage.setItem("user_data", JSON.stringify(userData));
     };
 
-    const logout = () => {
+    const logout = async () => {
+        // Call backend to clear the HTTP-only auth cookie
+        try {
+            await fetch(`${API}/api/user/logout`, {
+                method: 'POST',
+                credentials: 'include',
+            });
+        } catch (err) {
+            console.error('Logout API call failed:', err);
+        }
         setUser(null);
         setIsAuthenticated(false);
         localStorage.removeItem("user_data");
-        // Optional: Call backend logout endpoint
     };
 
     const value = {

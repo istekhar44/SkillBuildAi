@@ -57,23 +57,44 @@ const AuthLeftPanel = ({ isDark }) => (
         style={{
             background: isDark
                 ? 'linear-gradient(135deg, #1a1a2e 0%, #16213e 30%, #0f3460 60%, #1a1a2e 100%)'
-                : 'linear-gradient(135deg, #fce4d6 0%, #f5d0c5 30%, #e8c4b8 60%, #d4a99a 100%)',
+                : 'var(--bg-primary)',
         }}
     >
-        {/* Decorative circles */}
+        {/* Decorative bubbles */}
         <div className="absolute -top-16 -left-16 w-64 h-64 rounded-full opacity-40"
-            style={{ background: isDark ? 'linear-gradient(135deg, #6366f1, #8b5cf6)' : 'linear-gradient(135deg, #c0392b, #8e3a59)' }}
+            style={{ background: isDark ? 'linear-gradient(135deg, #6366f1, #8b5cf6)' : 'linear-gradient(135deg, #2563eb, #3b82f6)' }}
         />
         <div className="absolute top-20 right-10 w-8 h-8 rounded-full opacity-30"
-            style={{ background: isDark ? '#6366f1' : '#c0392b' }}
+            style={{ background: isDark ? '#6366f1' : '#2563eb' }}
         />
         <div className="absolute bottom-32 left-16 w-5 h-5 rounded-full opacity-25"
-            style={{ background: isDark ? '#8b5cf6' : '#8e3a59' }}
+            style={{ background: isDark ? '#8b5cf6' : '#3b82f6' }}
+        />
+        <div className="absolute top-12 left-1/3 w-4 h-4 rounded-full opacity-20"
+            style={{ background: isDark ? '#a78bfa' : '#60a5fa' }}
+        />
+        <div className="absolute -bottom-10 -right-10 w-48 h-48 rounded-full opacity-25"
+            style={{ background: isDark ? 'linear-gradient(135deg, #8b5cf6, #6366f1)' : 'linear-gradient(135deg, #3b82f6, #2563eb)' }}
+        />
+        <div className="absolute top-1/2 -left-6 w-12 h-12 rounded-full opacity-20"
+            style={{ background: isDark ? '#6366f1' : '#93c5fd' }}
+        />
+        <div className="absolute top-[15%] right-[20%] w-6 h-6 rounded-full opacity-25"
+            style={{ background: isDark ? '#818cf8' : '#60a5fa' }}
+        />
+        <div className="absolute bottom-[15%] right-[10%] w-10 h-10 rounded-full opacity-20"
+            style={{ background: isDark ? '#a78bfa' : '#93c5fd' }}
+        />
+        <div className="absolute bottom-[45%] left-[8%] w-3 h-3 rounded-full opacity-30"
+            style={{ background: isDark ? '#c4b5fd' : '#3b82f6' }}
+        />
+        <div className="absolute top-[40%] right-[5%] w-16 h-16 rounded-full opacity-15"
+            style={{ background: isDark ? 'linear-gradient(135deg, #6366f1, #a78bfa)' : 'linear-gradient(135deg, #2563eb, #93c5fd)' }}
         />
         {/* Decorative diagonal lines */}
-        <div className="absolute top-1/4 right-1/4 w-4 h-0.5 rotate-45 opacity-20" style={{ background: isDark ? '#818cf8' : '#8e3a59' }} />
-        <div className="absolute top-1/3 left-1/3 w-6 h-0.5 -rotate-45 opacity-20" style={{ background: isDark ? '#6366f1' : '#c0392b' }} />
-        <div className="absolute bottom-1/4 right-1/3 w-5 h-0.5 rotate-12 opacity-15" style={{ background: isDark ? '#a78bfa' : '#8e3a59' }} />
+        <div className="absolute top-1/4 right-1/4 w-4 h-0.5 rotate-45 opacity-20" style={{ background: isDark ? '#818cf8' : '#3b82f6' }} />
+        <div className="absolute top-1/3 left-1/3 w-6 h-0.5 -rotate-45 opacity-20" style={{ background: isDark ? '#6366f1' : '#2563eb' }} />
+        <div className="absolute bottom-1/4 right-1/3 w-5 h-0.5 rotate-12 opacity-15" style={{ background: isDark ? '#a78bfa' : '#60a5fa' }} />
 
         <div className="relative z-10 flex flex-col items-center px-12 py-16 max-w-lg">
             {/* Large circular background behind illustration */}
@@ -82,7 +103,7 @@ const AuthLeftPanel = ({ isDark }) => (
                     style={{
                         background: isDark
                             ? 'radial-gradient(circle, rgba(99,102,241,0.15) 0%, transparent 70%)'
-                            : 'radial-gradient(circle, rgba(255,220,200,0.6) 0%, transparent 70%)'
+                            : 'radial-gradient(circle, rgba(37,99,235,0.12) 0%, transparent 70%)'
                     }}
                 />
                 <img
@@ -94,12 +115,12 @@ const AuthLeftPanel = ({ isDark }) => (
             </div>
 
             <h2 className="text-3xl font-bold mb-3 text-center"
-                style={{ color: isDark ? '#e0e7ff' : '#6b1d3a' }}
+                style={{ color: isDark ? '#e0e7ff' : '#1e3a5f' }}
             >
                 Turn your ideas into reality.
             </h2>
             <p className="text-center text-sm leading-relaxed"
-                style={{ color: isDark ? '#a5b4fc' : '#8e5a6e' }}
+                style={{ color: isDark ? '#a5b4fc' : '#4a6fa5' }}
             >
                 Start for free and get attractive offers from the community
             </p>
@@ -122,7 +143,7 @@ export const LoginPage = () => {
         setError('');
         setLoading(true);
         try {
-            const res = await fetch(`${API_URL}/user/google-login`, {
+            const res = await fetch(`${API_URL}/api/user/google-login`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 credentials: 'include',
@@ -166,7 +187,7 @@ export const LoginPage = () => {
         setError('');
         setLoading(true);
         try {
-            const res = await fetch(`${API_URL}/user/login`, {
+            const res = await fetch(`${API_URL}/api/user/login`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 credentials: 'include',
@@ -193,20 +214,20 @@ export const LoginPage = () => {
     };
 
     // Theme-aware colors
-    const bg = isDark ? 'var(--bg-primary)' : '#faf8f5';
+    const bg = isDark ? 'var(--bg-primary)' : 'var(--bg-primary)';
     const cardBg = isDark ? 'var(--bg-card)' : '#fff';
-    const inputBg = isDark ? 'var(--bg-input)' : '#fff';
-    const inputBorder = isDark ? 'var(--border-color)' : '#e0e0e0';
-    const textMain = isDark ? 'var(--text-primary)' : '#1a1a2e';
-    const textSub = isDark ? 'var(--text-secondary)' : '#8a8a9a';
-    const textLabel = isDark ? 'var(--text-secondary)' : '#444';
-    const textInput = isDark ? 'var(--text-primary)' : '#333';
-    const accent = isDark ? '#818cf8' : '#6b1d3a';
+    const inputBg = isDark ? 'var(--bg-input)' : '#f8fafc';
+    const inputBorder = isDark ? 'var(--border-color)' : '#dbe5f1';
+    const textMain = isDark ? 'var(--text-primary)' : 'var(--text-primary)';
+    const textSub = isDark ? 'var(--text-secondary)' : 'var(--text-muted)';
+    const textLabel = isDark ? 'var(--text-secondary)' : 'var(--text-secondary)';
+    const textInput = isDark ? 'var(--text-primary)' : 'var(--text-primary)';
+    const accent = isDark ? '#818cf8' : '#2563eb';
     const accentGradient = isDark
         ? 'linear-gradient(135deg, #6366f1, #8b5cf6)'
-        : 'linear-gradient(135deg, #6b1d3a, #8e3a59)';
-    const dividerColor = isDark ? 'var(--border-color)' : '#e0e0e0';
-    const logoBg = isDark ? 'linear-gradient(135deg, #6366f1, #8b5cf6)' : 'linear-gradient(135deg, #1a1a2e, #2d2d44)';
+        : 'linear-gradient(135deg, #2563eb, #4f46e5)';
+    const dividerColor = isDark ? 'var(--border-color)' : '#e2e8f0';
+    const logoBg = isDark ? 'linear-gradient(135deg, #6366f1, #8b5cf6)' : 'linear-gradient(135deg, #2563eb, #4f46e5)';
 
     return (
         <div className="min-h-screen font-sans flex flex-col" style={{ backgroundColor: bg }}>
@@ -216,9 +237,25 @@ export const LoginPage = () => {
                 <AuthLeftPanel isDark={isDark} />
 
                 {/* Right Panel - Login Form */}
-                <div className="w-full lg:w-1/2 flex items-center justify-center px-6 py-12"
+                <div className="w-full lg:w-1/2 flex items-center justify-center px-6 py-12 relative overflow-hidden"
                     style={{ backgroundColor: bg }}
                 >
+                    {/* Right panel bubbles */}
+                    <div className="absolute -top-10 -right-10 w-40 h-40 rounded-full opacity-20 pointer-events-none"
+                        style={{ background: isDark ? '#6366f1' : '#93c5fd' }}
+                    />
+                    <div className="absolute bottom-16 -left-8 w-24 h-24 rounded-full opacity-15 pointer-events-none"
+                        style={{ background: isDark ? '#8b5cf6' : '#60a5fa' }}
+                    />
+                    <div className="absolute top-[30%] right-[5%] w-6 h-6 rounded-full opacity-20 pointer-events-none"
+                        style={{ background: isDark ? '#a78bfa' : '#3b82f6' }}
+                    />
+                    <div className="absolute bottom-[20%] right-[15%] w-4 h-4 rounded-full opacity-25 pointer-events-none"
+                        style={{ background: isDark ? '#818cf8' : '#93c5fd' }}
+                    />
+                    <div className="absolute top-[60%] left-[8%] w-3 h-3 rounded-full opacity-20 pointer-events-none"
+                        style={{ background: isDark ? '#c4b5fd' : '#60a5fa' }}
+                    />
                     <div className="w-full max-w-md">
                         {/* Logo */}
                         <div className="flex justify-center mb-8">
@@ -383,7 +420,7 @@ export const RegisterPage = () => {
         setError('');
         setLoading(true);
         try {
-            const res = await fetch(`${API_URL}/user/google-login`, {
+            const res = await fetch(`${API_URL}/api/user/google-login`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 credentials: 'include',
@@ -435,7 +472,7 @@ export const RegisterPage = () => {
             formData.append('phoneNumber', registerForm.phoneNumber);
             formData.append('role', registerForm.role);
 
-            const res = await fetch(`${API_URL}/user/register`, {
+            const res = await fetch(`${API_URL}/api/user/register`, {
                 method: 'POST',
                 credentials: 'include',
                 body: formData
@@ -457,20 +494,20 @@ export const RegisterPage = () => {
     };
 
     // Theme-aware colors
-    const bg = isDark ? 'var(--bg-primary)' : '#faf8f5';
+    const bg = isDark ? 'var(--bg-primary)' : 'var(--bg-primary)';
     const cardBg = isDark ? 'var(--bg-card)' : '#fff';
-    const inputBg = isDark ? 'var(--bg-input)' : '#fff';
-    const inputBorder = isDark ? 'var(--border-color)' : '#e0e0e0';
-    const textMain = isDark ? 'var(--text-primary)' : '#1a1a2e';
-    const textSub = isDark ? 'var(--text-secondary)' : '#8a8a9a';
-    const textLabel = isDark ? 'var(--text-secondary)' : '#444';
-    const textInput = isDark ? 'var(--text-primary)' : '#333';
-    const accent = isDark ? '#818cf8' : '#6b1d3a';
+    const inputBg = isDark ? 'var(--bg-input)' : '#f8fafc';
+    const inputBorder = isDark ? 'var(--border-color)' : '#dbe5f1';
+    const textMain = isDark ? 'var(--text-primary)' : 'var(--text-primary)';
+    const textSub = isDark ? 'var(--text-secondary)' : 'var(--text-muted)';
+    const textLabel = isDark ? 'var(--text-secondary)' : 'var(--text-secondary)';
+    const textInput = isDark ? 'var(--text-primary)' : 'var(--text-primary)';
+    const accent = isDark ? '#818cf8' : '#2563eb';
     const accentGradient = isDark
         ? 'linear-gradient(135deg, #6366f1, #8b5cf6)'
-        : 'linear-gradient(135deg, #6b1d3a, #8e3a59)';
-    const dividerColor = isDark ? 'var(--border-color)' : '#e0e0e0';
-    const logoBg = isDark ? 'linear-gradient(135deg, #6366f1, #8b5cf6)' : 'linear-gradient(135deg, #1a1a2e, #2d2d44)';
+        : 'linear-gradient(135deg, #2563eb, #4f46e5)';
+    const dividerColor = isDark ? 'var(--border-color)' : '#e2e8f0';
+    const logoBg = isDark ? 'linear-gradient(135deg, #6366f1, #8b5cf6)' : 'linear-gradient(135deg, #2563eb, #4f46e5)';
 
     return (
         <div className="min-h-screen font-sans flex flex-col" style={{ backgroundColor: bg }}>
@@ -480,9 +517,25 @@ export const RegisterPage = () => {
                 <AuthLeftPanel isDark={isDark} />
 
                 {/* Right Panel - Register Form */}
-                <div className="w-full lg:w-1/2 flex items-center justify-center px-6 py-12"
+                <div className="w-full lg:w-1/2 flex items-center justify-center px-6 py-12 relative overflow-hidden"
                     style={{ backgroundColor: bg }}
                 >
+                    {/* Right panel bubbles */}
+                    <div className="absolute -top-10 -right-10 w-40 h-40 rounded-full opacity-20 pointer-events-none"
+                        style={{ background: isDark ? '#6366f1' : '#93c5fd' }}
+                    />
+                    <div className="absolute bottom-16 -left-8 w-24 h-24 rounded-full opacity-15 pointer-events-none"
+                        style={{ background: isDark ? '#8b5cf6' : '#60a5fa' }}
+                    />
+                    <div className="absolute top-[30%] right-[5%] w-6 h-6 rounded-full opacity-20 pointer-events-none"
+                        style={{ background: isDark ? '#a78bfa' : '#3b82f6' }}
+                    />
+                    <div className="absolute bottom-[20%] right-[15%] w-4 h-4 rounded-full opacity-25 pointer-events-none"
+                        style={{ background: isDark ? '#818cf8' : '#93c5fd' }}
+                    />
+                    <div className="absolute top-[60%] left-[8%] w-3 h-3 rounded-full opacity-20 pointer-events-none"
+                        style={{ background: isDark ? '#c4b5fd' : '#60a5fa' }}
+                    />
                     <div className="w-full max-w-md">
                         {/* Logo */}
                         <div className="flex justify-center mb-6">

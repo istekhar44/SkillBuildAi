@@ -7,6 +7,8 @@ import {
 } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 
+const API = import.meta.env.VITE_API_URL || 'http://localhost:5011';
+
 const Footer = () => {
     const [email, setEmail] = useState('');
     const [status, setStatus] = useState('idle');
@@ -22,7 +24,7 @@ const Footer = () => {
 
         setStatus('loading');
         try {
-            const res = await fetch(`${import.meta.env.VITE_API_URL}/newsletter/subscribe`, {
+            const res = await fetch(`${API}/api/newsletter/subscribe`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email }),
