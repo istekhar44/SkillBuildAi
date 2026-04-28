@@ -40,10 +40,14 @@ const CompaniesPage = () => {
         return () => clearTimeout(debounce);
     }, [searchTerm]);
 
-    // Use static data as fallback
-    const displayCompanies = usingApi ? companies : staticCompanies.filter(c =>
+    // Merge API and static companies, avoiding duplicates by name
+    const combinedCompanies = usingApi 
+        ? [...companies, ...staticCompanies.filter(sc => !companies.some(c => c.name.toLowerCase() === sc.name.toLowerCase()))]
+        : staticCompanies;
+
+    const displayCompanies = combinedCompanies.filter(c =>
         !searchTerm || c.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        c.industry?.toLowerCase().includes(searchTerm.toLowerCase())
+        (c.industry && c.industry.toLowerCase().includes(searchTerm.toLowerCase()))
     );
 
     return (
@@ -67,11 +71,11 @@ const CompaniesPage = () => {
                     </div>
                 </div>
 
-                {!usingApi && !loading && (
-                    <div className="mb-4 text-xs text-yellow-400/60 bg-yellow-500/5 border border-yellow-500/10 rounded-lg px-3 py-2">
-                        Showing sample companies. Connect your backend for live data.
-                    </div>
-                )}
+                {/* {!usingApi && !loading && (
+                    // <div className="mb-4 text-xs text-yellow-400/60 bg-yellow-500/5 border border-yellow-500/10 rounded-lg px-3 py-2">
+                    //     Showing sample companies. Connect your backend for live data.
+                    // </div>
+                )} */}
 
                 {loading ? (
                     <div className="text-center py-20 text-gray-400">Loading companies...</div>

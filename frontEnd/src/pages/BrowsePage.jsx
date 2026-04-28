@@ -3,7 +3,7 @@ import { useLocation } from 'react-router-dom';
 import NavBar from '../components/NavBar';
 import Footer from '../components/Footer';
 import JobApplyModal from '../components/JobApplyModal';
-import { jobListings as staticJobs, categories, locations } from '../data/jobs';
+import { categories, locations } from '../data/jobs';
 import { MapPin, Briefcase, Clock, Search, SlidersHorizontal } from 'lucide-react';
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:5011';
@@ -41,13 +41,12 @@ const BrowsePage = () => {
                 const res = await fetch(`${API}/api/job/get?${params.toString()}`);
                 const data = await res.json();
 
-                if (data.success && data.jobs?.length > 0) {
-                    setJobs(data.jobs);
+                if (data.success) {
+                    setJobs(data.jobs || []);
                     setUsingApi(true);
                 } else {
-                    // Fallback to static data if API returns empty
                     setJobs([]);
-                    setUsingApi(false);
+                    setUsingApi(true);
                 }
             } catch (err) {
                 console.error('Failed to fetch jobs from API:', err);
@@ -62,16 +61,7 @@ const BrowsePage = () => {
         return () => clearTimeout(debounce);
     }, [searchQuery, selectedCategory, selectedLocation]);
 
-    // Use static data as fallback if API returned nothing
-    const displayJobs = usingApi ? jobs : staticJobs.filter(job => {
-        const matchesCategory = !selectedCategory || job.category === selectedCategory;
-        const matchesLocation = !selectedLocation || job.location === selectedLocation;
-        const matchesSearch = !searchQuery ||
-            job.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            job.company.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            job.skills?.some(s => s.toLowerCase().includes(searchQuery.toLowerCase()));
-        return matchesCategory && matchesLocation && matchesSearch;
-    });
+    const displayJobs = jobs;
 
     return (
         <div className="min-h-screen font-sans" style={{ backgroundColor: 'var(--bg-primary)', color: 'var(--text-primary)' }}>
@@ -125,11 +115,11 @@ const BrowsePage = () => {
                                 <input type="text" placeholder="Search jobs..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="pl-9 pr-4 py-2 rounded-lg bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-indigo-500 w-64" />
                             </div>
                         </div>
-                        {!usingApi && !loading && (
+                        {/* {!usingApi && !loading && (
                             <div className="mb-4 text-xs text-yellow-400/60 bg-yellow-500/5 border border-yellow-500/10 rounded-lg px-3 py-2">
                                 Showing sample jobs. Connect your backend for live data.
                             </div>
-                        )}
+                        )} */}
                         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
                             {displayJobs.map(job => {
                                 const isApiJob = !!job._id;
