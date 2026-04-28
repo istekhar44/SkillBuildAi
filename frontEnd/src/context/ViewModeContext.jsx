@@ -1,6 +1,27 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 
 const ViewModeContext = createContext();
+
+export const ViewModeProvider = ({ children }) => {
+    const [isRecruiterView, setIsRecruiterView] = useState(() => {
+        const savedMode = localStorage.getItem('isRecruiterView');
+        return savedMode === 'true';
+    });
+
+    const toggleViewMode = () => {
+        setIsRecruiterView(prev => !prev);
+    };
+
+    useEffect(() => {
+        localStorage.setItem('isRecruiterView', isRecruiterView);
+    }, [isRecruiterView]);
+
+    return (
+        <ViewModeContext.Provider value={{ isRecruiterView, toggleViewMode }}>
+            {children}
+        </ViewModeContext.Provider>
+    );
+};
 
 export const useViewMode = () => {
     const context = useContext(ViewModeContext);
@@ -8,27 +29,4 @@ export const useViewMode = () => {
         throw new Error('useViewMode must be used within a ViewModeProvider');
     }
     return context;
-};
-
-export const ViewModeProvider = ({ children }) => {
-    // 'recruiter' or 'student'
-    const [viewMode, setViewMode] = useState('recruiter');
-
-    const toggleViewMode = () => {
-        setViewMode(prev => prev === 'recruiter' ? 'student' : 'recruiter');
-    };
-
-    const value = {
-        viewMode,
-        setViewMode,
-        toggleViewMode,
-        isRecruiterView: viewMode === 'recruiter',
-        isStudentView: viewMode === 'student'
-    };
-
-    return (
-        <ViewModeContext.Provider value={value}>
-            {children}
-        </ViewModeContext.Provider>
-    );
 };
